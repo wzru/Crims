@@ -1,0 +1,108 @@
+#ifndef DEFINE_H
+#define DEFINE_H
+
+#include <winsock2.h>
+
+#define CAR_TYPE_NAME_LENGTH 20
+struct CarType//车辆分类信息结构体
+{
+    char code;//车辆类型编码, '1'-'5'
+    char name[CAR_TYPE_NAME_LENGTH];//车辆类型名称：经济型、商务型、豪华型、SUV、7座及以上车型
+    int quantity;//库存数量
+};
+typedef struct CarType CarType;
+
+#define CAR_INFORMATION_PLATE_LENGTH 10
+#define CAR_INFORMATION_NAME_LENGTH 20
+#define CAR_INFORMATION_GEAR_LENGTH 10
+struct CarInfo//车辆基本信息结构体
+{
+    int index;//车辆编号, 顺序增加
+    char plate[CAR_INFORMATION_PLATE_LENGTH];//车牌号
+    char code;//车辆类型编码, '1'-'5'
+    char name[CAR_INFORMATION_NAME_LENGTH];//车辆名称
+    char gear[CAR_INFORMATION_GEAR_LENGTH];//排挡方式
+    float daily_rent;//每日租金
+    char rent;//出租状态, 'y' | 'n'
+};
+typedef struct CarInfo CarInfo;
+
+#define RENT_ORDER_INDEX_LENGTH 20
+#define RENT_ORDER_IDENTITY_NUMBER_LENGTH 20
+#define RENT_ORDER_NAME_LENGTH 20
+#define RENT_ORDER_PHONE_NUMBER_LENGTH 20
+#define RENT_ORDER_CAR_INDEX_LENGTH 4
+#define RENT_ORDER_TIME_LENGTH 18
+struct RentOrder
+{
+    char index[RENT_ORDER_INDEX_LENGTH];//订单编号, 由订单生成时间的年月日+当日订单顺序号组成
+    char identity_number[RENT_ORDER_IDENTITY_NUMBER_LENGTH];//身份证号
+    char name[RENT_ORDER_NAME_LENGTH];//客人姓名
+    char phone_number[RENT_ORDER_PHONE_NUMBER_LENGTH];//手机号码
+    char car_index[RENT_ORDER_CAR_INDEX_LENGTH];//租用车辆编号
+    char pickup_time[RENT_ORDER_TIME_LENGTH];//取车时间
+    char scheduled_dropoff_time[RENT_ORDER_TIME_LENGTH];//预约还车时间
+    float deposit;//押金, 所租车辆应缴费用×5
+    char actual_dropoff_time[RENT_ORDER_TIME_LENGTH];//实际还车时间
+    float scheduled_fee;//在预约还车时间前还车, 应缴费用=每日租金×预约租车天数
+    float actual_fee;//在预约还车时间后还车, 实缴缴费用=每日租金×实际租车天数
+};
+typedef struct RentOrder RentOrder;
+
+#define LISTEN_PORT_LENGTH 5
+#define DEFAULT_LISTEN_PORT 8000
+#define BUFFER_LENGTH 1024
+extern int listen_port;//监听端口号
+extern int address_length;
+
+struct RentOrderNode
+{
+    RentOrder ro;
+    struct RentOrderNode *next;
+};
+typedef struct RentOrderNode RentOrderNode;
+
+struct CarInfoNode
+{
+    CarInfo ci;
+    RentOrderNode *head;
+    struct CarInfoNode *next;
+};
+typedef struct CarInfoNode CarInfoNode;
+
+struct CarTypeNode
+{
+    CarType ct;
+    CarInfoNode *head;
+    struct CarTypeNode *next;
+};
+typedef struct CarTypeNode CarTypeNode;
+
+#define DATABASE_PATH_LENGTH 256
+#define DEFAULT_DATABASE_PATH "../data/database"
+extern char database_path[DATABASE_PATH_LENGTH];
+
+extern CarTypeNode *head;
+
+extern CarTypeNode *ct_ptr;
+extern CarInfoNode *ci_ptr;
+extern RentOrderNode *ro_ptr;
+
+#define TYPE_CAR 'A'
+#define TYPE_INFO 'B'
+#define TYPE_ORDER 'C'
+
+#define JSON_BUFFER_LENGTH 1024
+extern char json_buffer[JSON_BUFFER_LENGTH];
+
+#define command_prompt '$'
+#define COMMAND_BUFFER_LENGTH 1024
+extern char command_buffer[COMMAND_BUFFER_LENGTH];
+#define SHELL_EXIT 20001027
+
+extern int is_saved;
+
+#define MAIN_HELP_LENGTH 4096
+extern char main_help[MAIN_HELP_LENGTH];
+
+#endif

@@ -1,0 +1,12 @@
+*.o
+*.obj
+
+*.exe
+
+**/.vscode/**
+**/.vs/**
+
+**/build/**
+**/bin/**
+
+**/node_modules/**
