@@ -8,5 +8,6 @@
 
 **/build/**
 **/bin/**
+**/dll/**
 
 **/node_modules/**

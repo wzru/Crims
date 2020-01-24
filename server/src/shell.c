@@ -3,7 +3,7 @@
 
 #include "define.h"
 #include "shell.h"
-#include "executor.h"
+#include "exec.h"
 #include "database.h"
 
 inline int shell (int argc, char *argv[])

@@ -10,12 +10,12 @@ This project uses cmake. Go check them out if you don't have them locally instal
 ./crims help # get help
 ./crims start # start server
 ./crims # shell
-./crims exec "some command" # execute some command
+./crims exec "some commands;" # execute some commands
 ```
 
 ## Schedule
 
-- [x] Data Structure
+- [x] Basic Data Structures
 - [x] File Storage
 - [x] Windows Socket
 - [x] Multithreading
@@ -23,6 +23,7 @@ This project uses cmake. Go check them out if you don't have them locally instal
 - [ ] Command Interpreter
 - [ ] XLS Support
 - [ ] Help Document
+- [ ] Test
 
 ## Maintainers
 
