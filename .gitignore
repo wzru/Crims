@@ -1,7 +1,7 @@
 *.o
 *.obj
-
 *.exe
+*.output
 
 **/.vscode/**
 **/.vs/**
@@ -9,5 +9,8 @@
 **/build/**
 **/bin/**
 **/dll/**
+**/obj/**
 
 **/node_modules/**
+
+Makefile

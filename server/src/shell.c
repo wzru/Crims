@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <windows.h>
 
-#include "define.h"
 #include "shell.h"
 #include "exec.h"
 #include "database.h"
+
+char command_buffer[COMMAND_BUFFER_LENGTH];
 
 inline int shell (int argc, char *argv[])
 {

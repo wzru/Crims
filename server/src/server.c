@@ -3,10 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "define.h"
 #include "server.h"
 
-#pragma comment(lib,"ws2_32.lib")
+//#pragma comment(lib,"ws2_32.lib")
+
+int listen_port = DEFAULT_LISTEN_PORT;
+int address_length = sizeof (struct sockaddr_in);
 
 inline int run_server()
 {

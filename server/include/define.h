@@ -3,6 +3,7 @@
 
 #include <winsock2.h>
 
+//基本数据结构定义
 #define CAR_TYPE_TNAME_LENGTH 20
 struct CarType//车辆分类信息结构体
 {
@@ -49,12 +50,7 @@ struct RentOrder
 };
 typedef struct RentOrder RentOrder;
 
-#define LISTEN_PORT_LENGTH 5
-#define DEFAULT_LISTEN_PORT 8000
-#define BUFFER_LENGTH 1024
-extern int listen_port;//监听端口号
-extern int address_length;
-
+//链表数据结构定义
 struct RentOrderNode
 {
     RentOrder ro;
@@ -78,31 +74,14 @@ struct CarTypeNode
 };
 typedef struct CarTypeNode CarTypeNode;
 
-#define DATABASE_PATH_LENGTH 256
-#define DEFAULT_DATABASE_PATH "./.db"
-extern char database_path[DATABASE_PATH_LENGTH];
+//数据库部分
 
-extern CarTypeNode *head;
 
-extern CarTypeNode *ct_ptr;
-extern CarInfoNode *ci_ptr;
-extern RentOrderNode *ro_ptr;
+//help部分
 
-#define TYPE_CAR 'A'
-#define TYPE_INFO 'B'
-#define TYPE_ORDER 'C'
-
-#define JSON_BUFFER_LENGTH 1024
-extern char json_buffer[JSON_BUFFER_LENGTH];
-
-#define command_prompt '$'
-#define COMMAND_BUFFER_LENGTH 1024
-extern char command_buffer[COMMAND_BUFFER_LENGTH];
-#define SHELL_EXIT 20001027
-
-extern int is_saved;
-
-#define MAIN_HELP_LENGTH 4096
-extern char main_help[MAIN_HELP_LENGTH];
+typedef unsigned char byte;
+typedef unsigned int uint;
+typedef unsigned int u32;
+typedef unsigned short u16;
 
 #endif

@@ -3,6 +3,15 @@
 #include "database.h"
 #include "define.h"
 
+char database_path[DATABASE_PATH_LENGTH] = DEFAULT_DATABASE_PATH;
+
+CarTypeNode *head = NULL;
+CarTypeNode *ct_ptr = NULL;
+CarInfoNode *ci_ptr = NULL;
+RentOrderNode *ro_ptr = NULL;
+
+int is_saved = 1;
+
 inline void read_initialize()
 {
     head = malloc (sizeof (CarType));

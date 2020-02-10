@@ -2,6 +2,8 @@
 
 #include "json.h"
 
+char json_buffer[JSON_BUFFER_LENGTH];
+
 inline void jsonify_car_type (CarType *ct, char *json)
 {
     sprintf (json, "{\"code\":\"%c\",\"tname\":\"%s\",\"quantity\":%d}",

@@ -2,6 +2,22 @@
 #define DATABASE_H
 
 #include <stdio.h>
+#include "define.h"
+
+#define DATABASE_PATH_LENGTH 256
+#define DEFAULT_DATABASE_PATH "./.db"
+extern char database_path[DATABASE_PATH_LENGTH];
+
+extern CarTypeNode *head;
+extern CarTypeNode *ct_ptr;
+extern CarInfoNode *ci_ptr;
+extern RentOrderNode *ro_ptr;
+
+#define TYPE_CAR 'A'
+#define TYPE_INFO 'B'
+#define TYPE_ORDER 'C'
+
+extern int is_saved;
 
 inline void read_initialize();//读时初始化数据库
 
