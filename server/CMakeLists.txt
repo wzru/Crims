@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.16)
+cmake_minimum_required (VERSION 3.15)
 project (crims_server)
 
 aux_source_directory(./src DIR_SRCS)
@@ -21,7 +21,7 @@ add_custom_target(parser)
 add_custom_command(
     TARGET parser
     PRE_BUILD
-    COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && chdir && make
+    COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && chdir && make static
     COMMAND ${CMAKE_COMMAND} -E 
         copy_if_different  
         ${PROJECT_SOURCE_DIR}/sql-parser/ast.h

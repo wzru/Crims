@@ -1,4 +1,4 @@
-#include <winsock2.h>
+#include <WinSock2.h>
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>

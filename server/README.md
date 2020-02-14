@@ -1,6 +1,6 @@
 # Crims Server
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims/server)[![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/server)[![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/server)[![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/server)
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims/tree/master/server) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/tree/master/server) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/tree/master/server) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/tree/master/server)
 
 ## Usage
 

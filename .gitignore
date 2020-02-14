@@ -5,12 +5,12 @@
 
 **/.vscode/**
 **/.vs/**
+**/.idea/**
 
 **/build/**
 **/bin/**
 **/dll/**
 **/obj/**
 
+**/cmake-build-*/**
 **/node_modules/**
-
-Makefile

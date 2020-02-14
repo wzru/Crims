@@ -8,7 +8,7 @@
 
 ## CSQL 
 
-**Crims Structured Query Language(CSQL)**是SQL的一门方言，是专为Crims设计的一门DSL。CSQL**大小写敏感**。
+**Crims Structured Query Language(CSQL)**是SQL的一门方言，是专为Crims设计的一门DSL。CSQL**大小写敏感**。  
 
 ### TYPE
 
@@ -413,7 +413,7 @@ SELECT CAR_INFO.plate,
        FROM CAR_INFO, RENT_ORDER
        WHERE CAR_INFO.cid=RENT_ORDER.cid
        GROUP BY CAR_INFO.plate
-       ORDER BY 累计出租天数 desc, 营业额 desc 
+       ORDER BY "累计出租天数" desc, "营业额" desc 
        LIMIT 10;
 ```
 
@@ -427,7 +427,7 @@ SELECT RENT_ORDER.pname,
            THEN RENT_ORDER.actual_fee END) AS "消费金额"
        FROM RENT_ORDER
        GROUP BY RENT_ORDER.identity_number
-       ORDER BY 消费金额 desc 
+       ORDER BY "消费金额" desc 
        LIMIT 10;
 ```
 

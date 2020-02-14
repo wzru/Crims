@@ -32,7 +32,7 @@ inline int start (int argc, char *argv[])
         return -1;
     }
     int *server_thread_result = malloc (sizeof (int));
-    pthread_join (server_thread, &server_thread_result);
+    pthread_join (server_thread, (void**)&server_thread_result);
     if (server_thread_result == NULL || *server_thread_result)
     {
         printf ("Server ERROR!\n");
