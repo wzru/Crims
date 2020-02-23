@@ -14,6 +14,7 @@ enum TYPE_ID
     EXPR_STRING,
     EXPR_INTNUM,
     EXPR_APPROXNUM,
+    EXPR_DATETIME,
     EXPR_ADD,
     EXPR_SUB,
     EXPR_MUL,
@@ -28,11 +29,13 @@ enum TYPE_ID
     EXPR_GT,
     EXPR_LE,
     EXPR_GE,
+    EXPR_IN_VAL_LIST,
+    EXPR_NOT_IN_VAL_LIST,
+    EXPR_LIKE,
+    EXPR_NOT_LIKE,
     EXPR_NEG,
     EXPR_NOT,
     EXPR_SELECT,
-    EXPR_IN_VAL_LIST,
-    EXPR_NOT_IN_VAL_LIST,
     EXPR_IN_SELECT,
     EXPR_NOT_IN_SELECT,
     EXPR_VAL_LIST,
@@ -45,10 +48,7 @@ enum TYPE_ID
     EXPR_CASE_ELSE,
     EXPR_CASE_EXPR,
     EXPR_CASE_EXPR_ELSE,
-    EXPR_LIKE,
-    EXPR_NOT_LIKE,
-    EXPR_COLUMN,
-    EXPR_COLUMN_ALL,
+    EXPR_CASE_NODE,
     TABLE_DEFAULT,
     TABLE_SUBQUERY,
     ORDERBY,
@@ -69,7 +69,7 @@ typedef struct ExprNode
         float floatval;
         char *strval;
         struct SelectNode *select;
-        struct CaseNode *case_head;
+        struct ExprNode *case_head;
         byte sc;
     };
     char *table, *alias;
@@ -83,12 +83,6 @@ typedef struct ValueListNode
     struct ExprNode *head;
     struct ValueListNode *next;
 } ValueListNode;
-
-typedef struct CaseNode
-{
-    struct ExprNode *cond, *then;
-    struct CaseNode *next;
-} CaseNode;
 
 typedef struct TableNode
 {
@@ -134,7 +128,6 @@ typedef struct SelectNode
 typedef struct DeleteNode
 {
     //简易版
-    struct ColumnNode *column_head;
     char *table;
     struct ExprNode *where;
 } DeleteNode;

@@ -11,4 +11,6 @@ inline void output_car_type (CarType *ct);
 inline void output_car_info (CarInfo *ci);
 inline void output_rent_order (RentOrder *ro);
 
+inline int debug();
+
 #endif

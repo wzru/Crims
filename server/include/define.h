@@ -1,8 +1,6 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#include <winsock2.h>
-
 //基本数据结构定义
 #define CAR_TYPE_TNAME_LENGTH 20
 struct CarType//车辆分类信息结构体
@@ -74,14 +72,26 @@ struct CarTypeNode
 };
 typedef struct CarTypeNode CarTypeNode;
 
-//数据库部分
-
-
-//help部分
-
 typedef unsigned char byte;
 typedef unsigned int uint;
 typedef unsigned int u32;
 typedef unsigned short u16;
+
+enum//用来区分当前运行状态
+{
+    STATUS_SHELL,
+    STATUS_SERVER,
+    STATUS_EXEC,
+    STATUS_EXIT,
+    STATUS_ERROR,
+    STATUS_UNKNOWN
+};
+extern byte crims_status;
+
+#define TABLE_COLUMN_COUNT 20
+#define COLUMN_NAME_LENGTH 23
+#define TABLE_NAME_LENGTH 11
+#define DATABASE_NAME_LENGTH 10
+#define DATABASE_TABLE_COUNT 3
 
 #endif

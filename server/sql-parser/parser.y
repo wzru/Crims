@@ -20,7 +20,6 @@
     struct TableNode *table;
     struct LimitNode *limit;
     struct ExprNode *expr;
-    struct CaseNode *cas;
     struct ValueListNode *value_list;
     struct SetNode *assign;
 }
@@ -81,13 +80,12 @@
 %token FCOUNT
 %token FSUM
 
-%type <expr> expr opt_where opt_groupby opt_orderby insert_vals select_expr_list select_expr val_list opt_val_list groupby_list orderby_list orderby_node
+%type <expr> expr opt_where opt_groupby opt_orderby insert_vals select_expr_list select_expr val_list opt_val_list groupby_list orderby_list orderby_node case_list
 %type <select> select_stmt table_subquery
 %type <delete> delete_stmt
 %type <insert> insert_stmt
 %type <update> update_stmt
 %type <limit> opt_limit
-%type <cas> case_list
 %type <strval> opt_as_alias
 %type <table> table_references table_reference
 %type <intval> opt_asc_desc
@@ -303,12 +301,14 @@ expr: CASE expr case_list END {
     ;
 
 case_list: WHEN expr THEN expr {
-        $$ = calloc(1, sizeof(CaseNode));
-        $$->cond = $2, $$->then = $4;
+        $$ = calloc(1, sizeof(ExprNode));
+        $$->type = EXPR_CASE_NODE;
+        $$->l = $2, $$->r = $4;
     }
     | WHEN expr THEN expr case_list {
-        $$ = calloc(1, sizeof(CaseNode));
-        $$->cond = $2, $$->then = $4;
+        $$ = calloc(1, sizeof(ExprNode));
+        $$->type = EXPR_CASE_NODE;
+        $$->l = $2, $$->r = $4;
         $$->next = $5;
     }
     ;
@@ -374,6 +374,7 @@ groupby_list: expr {
     }
     | expr ',' groupby_list {
         $$ = $1;
+        $$->op = $$->type;
         $$->type = GROUPBY;
         $$->next = $3;
     }
