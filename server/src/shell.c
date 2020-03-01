@@ -16,6 +16,7 @@ inline void print_command_prompt()
 
 inline int shell (int argc, char *argv[])
 {
+    database_initialize();
     system ("cls");
     while (1)
     {

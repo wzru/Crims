@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -31,29 +32,43 @@ inline void output_rent_order (RentOrder *ro)
     printf ("%s\n", json_buffer);
 }
 
-inline int debug()//用来测试读写是否正常
+inline int test_read_write() //用来测试读写是否正常
 {
-    read(database_path);
+    read (database_path);
     char s[20];
     int type;
     CarType ct;
     CarInfo ci;
     RentOrder ro;
-    freopen("../data/input.txt", "r", stdin);
-    if(1)
-    while(scanf("%s", s)!=EOF)
+    if (0)
     {
-        puts("Please input...");
-        if(!strcmp(s, "input"))
+        freopen ("../data/test_input.txt", "r", stdin);
+        while (scanf ("%s", s) != EOF)
         {
-            scanf("%d", &type);
-            if(type==1) input_car_type(&ct), insert_car_type(&ct);
-            else if(type==2) input_car_info(&ci), insert_car_info(&ci);
-            else if(type==3) input_rent_order(&ro), insert_rent_order(&ro);
+            puts ("Please input...");
+            if (!strcmp (s, "input"))
+            {
+                scanf ("%d", &type);
+                if (type == 1)
+                {
+                    input_car_type (&ct), insert_car_type (&ct);
+                }
+                else if (type == 2)
+                {
+                    input_car_info (&ci), insert_car_info (&ci);
+                }
+                else if (type == 3)
+                {
+                    input_rent_order (&ro), insert_rent_order (&ro);
+                }
+            }
+            else
+            {
+                break;
+            }
         }
-        else break;
     }
-    system("chcp 65001");
-    write(database_path);
-    recursive_print(head->next, NULL, NULL, TYPE_CAR, stdout);
+    system ("chcp 65001");
+    recursive_print (head->next, NULL, NULL, TYPE_CAR, stdout);
+    write (database_path);
 }

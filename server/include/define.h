@@ -13,7 +13,7 @@ typedef struct CarType CarType;
 
 #define CAR_INFORMATION_PLATE_LENGTH 10
 #define CAR_INFORMATION_CNAME_LENGTH 20
-#define CAR_INFORMATION_GEAR_LENGTH 10
+#define CAR_INFORMATION_GEAR_LENGTH 14
 struct CarInfo//车辆基本信息结构体
 {
     int cid;//车辆编号, 顺序增加
@@ -73,9 +73,9 @@ struct CarTypeNode
 typedef struct CarTypeNode CarTypeNode;
 
 typedef unsigned char byte;
-typedef unsigned int uint;
-typedef unsigned int u32;
+typedef unsigned int uint,u32;
 typedef unsigned short u16;
+typedef unsigned long long ull, datetime, int64, i64;
 
 enum//用来区分当前运行状态
 {
@@ -93,5 +93,14 @@ extern byte crims_status;
 #define TABLE_NAME_LENGTH 11
 #define DATABASE_NAME_LENGTH 10
 #define DATABASE_TABLE_COUNT 3
+
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+#ifndef min
+#define min(a,b) ((a)>(b)?(b):(a))
+#endif
+
+#define CRIMS_DATETIME_FORMAT "%Y-%m-%d/%H:%M"
 
 #endif

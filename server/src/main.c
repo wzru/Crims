@@ -4,6 +4,7 @@
 #include "database.h"
 #include "define.h"
 #include "shell.h"
+#include "debug.h"
 #include "start.h"
 #include "help.h"
 #include "exec.h"
@@ -20,7 +21,7 @@ int main (int argc, char *argv[])
     case 1:
         crims_status = STATUS_SHELL;
         return shell (argc, argv); //控制权移交shell
-        //return debug();
+        //return test_read_write();
         break;
     default:
         if (!strcmp (argv[1], "help"))
@@ -39,7 +40,7 @@ int main (int argc, char *argv[])
         }
         else if(!strcmp(argv[1], "debug"))
         {
-            return debug();
+            //return debug();
         }
     }
     return 0;

@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#define EXPR_LENGTH 256
+
 typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char byte;
@@ -9,12 +11,12 @@ extern char *type_name[1024];
 
 enum TYPE_ID
 {
-    EXPR_NAME = 512,
-    EXPR_TABLE_COLUMN,
-    EXPR_STRING,
-    EXPR_INTNUM,
+    EXPR_INTNUM = 512,
     EXPR_APPROXNUM,
+    EXPR_STRING,
     EXPR_DATETIME,
+    EXPR_NAME,
+    EXPR_TABLE_COLUMN,
     EXPR_ADD,
     EXPR_SUB,
     EXPR_MUL,
@@ -29,12 +31,12 @@ enum TYPE_ID
     EXPR_GT,
     EXPR_LE,
     EXPR_GE,
+    EXPR_NEG,
+    EXPR_NOT,
     EXPR_IN_VAL_LIST,
     EXPR_NOT_IN_VAL_LIST,
     EXPR_LIKE,
     EXPR_NOT_LIKE,
-    EXPR_NEG,
-    EXPR_NOT,
     EXPR_SELECT,
     EXPR_IN_SELECT,
     EXPR_NOT_IN_SELECT,
@@ -57,7 +59,8 @@ enum TYPE_ID
     SELECT_STMT,
     DELETE_STMT,
     INSERT_STMT,
-    UPDATE_STMT
+    UPDATE_STMT,
+    EXPR_ERROR
 };
 
 typedef struct ExprNode
@@ -74,6 +77,7 @@ typedef struct ExprNode
     };
     char *table, *alias;
     u16 op;
+    char text[EXPR_LENGTH];
     struct ExprNode *l, *r;
     struct ExprNode *next;
 } ExprNode;
@@ -123,6 +127,7 @@ typedef struct SelectNode
     struct ExprNode *group;
     struct ExprNode *order;
     struct LimitNode *limit;
+    void *recs;
 } SelectNode;
 
 typedef struct DeleteNode

@@ -20,7 +20,7 @@ This project uses cmake. Go check them out if you don't have them locally instal
 - [x] Windows Socket
 - [x] Multithreading
 - [x] SQL Parser
-- [ ] Logical Plan
+- [x] SQL Executor
 - [ ] Data Operation
 - [ ] XLS Support
 - [ ] Help Document
