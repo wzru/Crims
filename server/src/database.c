@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -26,37 +27,37 @@ DatabaseInfo catalog =
         {
             "CAR_TYPE", 3,
             {
-                {"code",     EXPR_STRING, sizeof (char),         0 },
-                {"tname",    EXPR_STRING, CAR_TYPE_TNAME_LENGTH, sizeof (char) },
-                {"quantity", EXPR_INTNUM, sizeof (int),          sizeof (char) + CAR_TYPE_TNAME_LENGTH }
+                {"code",     EXPR_STRING, sizeof (char),         offsetof(CarType, code) },
+                {"tname",    EXPR_STRING, CAR_TYPE_TNAME_LENGTH, offsetof(CarType, tname) },
+                {"quantity", EXPR_INTNUM, sizeof (int),          offsetof(CarType, quantity) }
             }
         },
         {
             "CAR_INFO", 7,
             {
-                {"cid",        EXPR_INTNUM,    sizeof (int),                 0 },
-                {"plate",      EXPR_STRING,    CAR_INFORMATION_PLATE_LENGTH, sizeof (int) },
-                {"code",       EXPR_STRING,    sizeof (char),                sizeof (int) + CAR_INFORMATION_PLATE_LENGTH },
-                {"cname",      EXPR_STRING,    CAR_INFORMATION_CNAME_LENGTH, sizeof (int) + CAR_INFORMATION_PLATE_LENGTH + sizeof (char) },
-                {"gear",       EXPR_STRING,    CAR_INFORMATION_GEAR_LENGTH,  sizeof (int) + CAR_INFORMATION_PLATE_LENGTH + sizeof (char) + CAR_INFORMATION_CNAME_LENGTH },
-                {"daily_rent", EXPR_APPROXNUM, sizeof (float),               sizeof (int) + CAR_INFORMATION_PLATE_LENGTH + sizeof (char) + CAR_INFORMATION_CNAME_LENGTH + CAR_INFORMATION_GEAR_LENGTH },
-                {"rent",       EXPR_STRING,    sizeof (char),                sizeof (int) + CAR_INFORMATION_PLATE_LENGTH + sizeof (char) + CAR_INFORMATION_CNAME_LENGTH + CAR_INFORMATION_GEAR_LENGTH + sizeof (float) }
+                {"cid",        EXPR_INTNUM,    sizeof (int),                 offsetof(CarInfo, cid) },
+                {"plate",      EXPR_STRING,    CAR_INFORMATION_PLATE_LENGTH, offsetof(CarInfo, plate) },
+                {"code",       EXPR_STRING,    sizeof (char),                offsetof(CarInfo, code) },
+                {"cname",      EXPR_STRING,    CAR_INFORMATION_CNAME_LENGTH, offsetof(CarInfo, cname) },
+                {"gear",       EXPR_STRING,    CAR_INFORMATION_GEAR_LENGTH,  offsetof(CarInfo, gear) },
+                {"daily_rent", EXPR_APPROXNUM, sizeof (float),               offsetof(CarInfo, daily_rent) },
+                {"rent",       EXPR_STRING,    sizeof (char),                offsetof(CarInfo, rent) }
             }
         },
         {
             "RENT_ORDER", 11,
             {
-                {"oid",                    EXPR_INTNUM,    RENT_ORDER_OID_LENGTH,             0 },
-                {"identity_number",        EXPR_STRING,    RENT_ORDER_IDENTITY_NUMBER_LENGTH, RENT_ORDER_OID_LENGTH },
-                {"pname",                  EXPR_STRING,    RENT_ORDER_PNAME_LENGTH,           RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH },
-                {"phone_number",           EXPR_STRING,    RENT_ORDER_PHONE_NUMBER_LENGTH,    RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH },
-                {"cid",                    EXPR_INTNUM,    sizeof (int),                      RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH },
-                {"pickup_time",            EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH + sizeof (int) },
-                {"scheduled_dropoff_time", EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH + sizeof (int) + RENT_ORDER_TIME_LENGTH },
-                {"deposit",                EXPR_APPROXNUM, sizeof (float),                    RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH + sizeof (int) + RENT_ORDER_TIME_LENGTH * 2 },
-                {"actual_dropoff_time",    EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH + sizeof (int) + RENT_ORDER_TIME_LENGTH * 2 + sizeof (float) },
-                {"scheduled_fee",          EXPR_APPROXNUM, sizeof (float),                    RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH + sizeof (int) + RENT_ORDER_TIME_LENGTH * 3 + sizeof (float) },
-                {"scheduled_fee",          EXPR_APPROXNUM, sizeof (float),                    RENT_ORDER_OID_LENGTH + RENT_ORDER_IDENTITY_NUMBER_LENGTH + RENT_ORDER_PNAME_LENGTH + RENT_ORDER_PHONE_NUMBER_LENGTH + sizeof (int) + RENT_ORDER_TIME_LENGTH * 3 + sizeof (float) * 2}
+                {"oid",                    EXPR_INTNUM,    RENT_ORDER_OID_LENGTH,             offsetof(RentOrder, oid) },
+                {"identity_number",        EXPR_STRING,    RENT_ORDER_IDENTITY_NUMBER_LENGTH, offsetof(RentOrder, identity_number) },
+                {"pname",                  EXPR_STRING,    RENT_ORDER_PNAME_LENGTH,           offsetof(RentOrder, pname) },
+                {"phone_number",           EXPR_STRING,    RENT_ORDER_PHONE_NUMBER_LENGTH,    offsetof(RentOrder, phone_number) },
+                {"cid",                    EXPR_INTNUM,    sizeof (int),                      offsetof(RentOrder, cid) },
+                {"pickup_time",            EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof(RentOrder, pickup_time) },
+                {"scheduled_dropoff_time", EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof(RentOrder, scheduled_dropoff_time) },
+                {"deposit",                EXPR_APPROXNUM, sizeof (float),                    offsetof(RentOrder, deposit) },
+                {"actual_dropoff_time",    EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof(RentOrder, actual_dropoff_time) },
+                {"scheduled_fee",          EXPR_APPROXNUM, sizeof (float),                    offsetof(RentOrder, scheduled_fee) },
+                {"actual_fee",             EXPR_APPROXNUM, sizeof (float),                    offsetof(RentOrder, actual_fee) }
             }
         }
     }

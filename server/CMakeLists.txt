@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.15)
 project (crims_server)
 #set(CMAKE_C_COMPILER "C:\Program Files\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\gcc.exe")
 
+set(CMAKE_SH "CMAKE_SH-NOTFOUND")
 aux_source_directory(./src DIR_SRCS)
 include_directories(./include)
 

@@ -2,11 +2,9 @@
 #define AST_H
 
 #define EXPR_LENGTH 256
-
 typedef unsigned int u32;
 typedef unsigned short u16;
 typedef unsigned char byte;
-
 extern char *type_name[1024];
 
 enum TYPE_ID

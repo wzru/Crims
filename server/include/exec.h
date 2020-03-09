@@ -4,14 +4,6 @@
 #include "define.h"
 #include "ast.h"
 
-typedef struct TableColumnArray
-{
-    int count;
-    char table[TABLE_COLUMN_COUNT][TABLE_NAME_LENGTH],
-         column[TABLE_COLUMN_COUNT][COLUMN_NAME_LENGTH];
-} TableColumnArray;
-extern TableColumnArray table_column_array;
-
 extern byte crims_table_column_count[DATABASE_TABLE_COUNT];
 char crims_table_name[DATABASE_TABLE_COUNT][TABLE_NAME_LENGTH];
 

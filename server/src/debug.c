@@ -40,7 +40,7 @@ inline int test_read_write() //用来测试读写是否正常
     CarType ct;
     CarInfo ci;
     RentOrder ro;
-    if (0)
+    if (1)
     {
         freopen ("../data/test_input.txt", "r", stdin);
         while (scanf ("%s", s) != EOF)

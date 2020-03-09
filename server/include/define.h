@@ -1,6 +1,8 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
+#define DEBUG//DEBUG模式
+
 //基本数据结构定义
 #define CAR_TYPE_TNAME_LENGTH 20
 struct CarType//车辆分类信息结构体

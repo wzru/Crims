@@ -7,8 +7,6 @@ lexer.c
 *.tab.c
 *.tab.h
 
-.db
-
 **/.vscode/**
 **/.vs/**
 **/.idea/**
