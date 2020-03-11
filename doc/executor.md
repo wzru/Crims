@@ -1,17 +1,23 @@
 # SQL Executor Feature List
 
 - [x] SELECT code FROM CAR_TYPE;
-- [ ] SELECT code, cname, gear, daily_rent 
+- [x] SELECT code, cname, gear, daily_rent 
+  FROM CAR_INFO
+   	WHERE code IN (SELECT code 
+                  FROM CAR_TYPE 
+         	     WHERE tname="经济型");
+- [x] SELECT code, cname, gear, daily_rent 
   	FROM CAR_INFO
     	WHERE rent='n' 
     	AND code IN (SELECT code 
                    FROM CAR_TYPE 
-          	     WHERE tname="经济型");
+          	     WHERE tname="商务型");
 - [x] SELECT code, cname, gear, daily_rent  
   	FROM CAR_INFO
     	WHERE rent='n';
 - [x] SELECT * FROM CAR_TYPE;
-- [ ] SELECT code, cname, gear, daily_rent 
+- [x] SELECT * FROM CAR_TYPE, CAR_INFO;
+- [x] SELECT code, cname, gear, daily_rent 
   	FROM CAR_INFO
     	WHERE rent='n'
     	AND code IN (SELECT code 
@@ -24,16 +30,20 @@
 - [ ] SELECT *
   	FROM CAR_INFO
     	WHERE cname LIKE "%别克%";
-- [ ] SELECT *
+- [x] SELECT *
   	FROM CAR_INFO
     	WHERE rent="n";
-- [ ] SELECT *
+- [x] SELECT cid, cname
   	FROM CAR_INFO
-    	WHERE cname="别克英朗" 
+    	WHERE cname = "别克英朗" 
+    	AND rent="y";
+- [x] SELECT *
+  	FROM CAR_INFO
+    	WHERE cname = "别克英朗" 
     	AND rent="n";
-- [ ] SELECT *
+- [x] SELECT *
   	FROM RENT_ORDER
-    	WHERE identity_number="23010119920010024";
+    	WHERE identity_number="470291339330808704";
 - [ ] SELECT *
   	FROM RENT_ORDER
     	WHERE cid IN (SELECT cid

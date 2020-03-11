@@ -47,7 +47,7 @@ DatabaseInfo catalog =
         {
             "RENT_ORDER", 11,
             {
-                {"oid",                    EXPR_INTNUM,    RENT_ORDER_OID_LENGTH,             offsetof(RentOrder, oid) },
+                {"oid",                    EXPR_STRING,    RENT_ORDER_OID_LENGTH,             offsetof(RentOrder, oid) },
                 {"identity_number",        EXPR_STRING,    RENT_ORDER_IDENTITY_NUMBER_LENGTH, offsetof(RentOrder, identity_number) },
                 {"pname",                  EXPR_STRING,    RENT_ORDER_PNAME_LENGTH,           offsetof(RentOrder, pname) },
                 {"phone_number",           EXPR_STRING,    RENT_ORDER_PHONE_NUMBER_LENGTH,    offsetof(RentOrder, phone_number) },
@@ -351,8 +351,7 @@ inline void print_value (ExprNode *val)
 char format[JSON_BUFFER_LENGTH];
 inline void print_result (Records *recs)
 {
-    //system("@echo off");
-    system ("chcp 65001");
+    //system ("chcp 65001");
     memset (format, 0, sizeof (format));
     if (recs == NULL || recs->cnt == 0)
     {

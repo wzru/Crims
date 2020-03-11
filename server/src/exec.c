@@ -386,6 +386,7 @@ inline ExprNode *calc_logic (uint type, ExprNode *l, ExprNode *r)
         {
             res->intval = get_logic (l) ^ get_logic (r);
         }
+        return res;
     }
     return &error_expr;
 }
@@ -441,38 +442,39 @@ inline ExprNode *is_in_val_list (ExprNode *expr, ExprNode *list, Record *rec)
     return res;
 }
 
-inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select)
+inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select, Record *rec)
 {
-    Record *rec;
-    Records *recs;
+    Record *subrec;
+    Records *subrecs;
     ExprNode *res = calloc (1, sizeof (ExprNode));
     res->type = EXPR_INTNUM;
     res->intval = 1;
     if (select->recs == NULL)
     {
-        rec = calloc (1, sizeof (Record));
-        recs = calloc (1, sizeof (Records));
-        clear_records (recs);
-        do_select (select, rec, recs, 1);
+        subrec = calloc (1, sizeof (Record));
+        subrecs = calloc (1, sizeof (Records));
+        clear_records (subrecs);
+        do_select (select, subrec, subrecs, 1);
     }
     else
     {
-        recs = select->recs;
+        subrecs = select->recs;
     }
-    if (!recs->cnt) //如果没找到任何结果
+    if (!subrecs->cnt) //如果没找到任何结果
     {
         res->intval = 0;
     }
-    else if (recs->recs[0].cnt != 1) //如果有多列
+    else if (subrecs->recs[0].cnt != 1) //如果有多列
     {
         write_message ("Operand should contain 1 column");
         return &error_expr;
     }
     else
     {
-        for (uint i = 0; i < recs->cnt; ++i)
+        for (uint i = 0; i < subrecs->cnt; ++i)
         {
-            if (MAKE_EXPR_EQ (& (recs->recs[i].item), expr, rec))
+            res = MAKE_EXPR_EQ (& (subrecs->recs[i].item[0]), expr, rec);
+            if (res && res->type==EXPR_INTNUM && res->intval==1)
             {
                 return res;
             }
@@ -566,7 +568,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     case EXPR_NOT_IN_SELECT:
         flag = 1;
     case EXPR_IN_SELECT:
-        res = is_in_select (expr->l, expr->select);
+        res = is_in_select (expr->l, expr->select, rec);
         res->intval ^= flag;
         return res;
     default:
@@ -597,7 +599,7 @@ inline void append_record_column (ExprNode *val, Record *rec)
     memcpy (&rec->item[ (rec->cnt)++], val, sizeof (ExprNode));
 }
 
-inline int extract_record (ExprNode *column_head, Record *rec, Record *recs)
+inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
 {
     if (column_head == NULL)
     {
@@ -612,7 +614,7 @@ inline int extract_record (ExprNode *column_head, Record *rec, Record *recs)
         }
     }
     else
-        for (uint i = 0; i < col_cnt; ++i)
+        while(column_head)
         {
             ExprNode *res = evaluate_expr (column_head, rec);
             if (res == NULL || res->type == EXPR_ERROR)
@@ -642,7 +644,7 @@ inline int get_index_by_table_name (char *table)
 
 inline int calc_col_cnt (TableNode *table_head)
 {
-    int res = 1;
+    int res = 0;
     while (table_head)
     {
         int tmp = get_index_by_table_name (table_head->table);
@@ -654,7 +656,11 @@ inline int calc_col_cnt (TableNode *table_head)
         }
         else
         {
-            res *= catalog.tbls[tmp].cc;
+            for (uint i = 0; i < catalog.tbls[tmp].cc; ++i)
+            {
+                strcat (col_name[col_cnt++], catalog.tbls[tmp].cols[i].name);
+            }
+            //res += catalog.tbls[tmp].cc;
         }
         table_head = table_head->next;
     }
@@ -667,7 +673,8 @@ inline void load_column_names (ExprNode *col, TableNode *tbl)
     {
         if (col->type == SELECT_ALL)
         {
-            col_cnt = calc_col_cnt (tbl);
+            calc_col_cnt (tbl);
+            //col_cnt = calc_col_cnt (tbl);
             return;
         }
         else

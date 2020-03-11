@@ -17,6 +17,7 @@ inline void print_command_prompt()
 inline int shell (int argc, char *argv[])
 {
     database_initialize();
+    system ("chcp 65001");
     system ("cls");
     while (1)
     {

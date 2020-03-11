@@ -23,7 +23,6 @@ typedef struct Record
     int siz[DATABASE_TABLE_COUNT];
     void *arr[DATABASE_TABLE_COUNT];
 } Record;
-
 extern ExprNode error_expr;
 
 typedef struct Records
@@ -31,6 +30,13 @@ typedef struct Records
     Record *recs;
     uint cnt, size;
 } Records;
+
+typedef struct TargetList
+{
+    uint cnt;
+
+};
+
 
 #define RECS_INITIAL_LENGTH 128
 extern Record rec;
@@ -46,7 +52,7 @@ inline void clear_records (Records *recs);
 inline void append_record_table (TableNode *table, Record *rec);
 inline void append_record_column (ExprNode *column, Record *rec);
 inline int get_next_record (Record *rec);
-inline int extract_record (ExprNode *column_head, Record *rec, Record *recs);
+inline int extract_record (ExprNode *column_head, Record *rec, Records *recs);
 inline void add_record (Record *rec, Records *recs);
 inline void query_initialize();
 inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec);
