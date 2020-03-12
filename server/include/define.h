@@ -1,8 +1,6 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#define DEBUG//DEBUG模式
-
 //基本数据结构定义
 #define CAR_TYPE_TNAME_LENGTH 20
 struct CarType//车辆分类信息结构体
@@ -75,7 +73,7 @@ struct CarTypeNode
 typedef struct CarTypeNode CarTypeNode;
 
 typedef unsigned char byte;
-typedef unsigned int uint,u32;
+typedef unsigned int uint, u32;
 typedef unsigned short u16;
 typedef unsigned long long ull, datetime, int64, i64;
 
@@ -97,10 +95,10 @@ extern byte crims_status;
 #define DATABASE_TABLE_COUNT 3
 
 #ifndef max
-#define max(a,b) ((a)>(b)?(a):(b))
+    #define max(a,b) ((a)>(b)?(a):(b))
 #endif
 #ifndef min
-#define min(a,b) ((a)>(b)?(b):(a))
+    #define min(a,b) ((a)>(b)?(b):(a))
 #endif
 
 #define CRIMS_DATETIME_FORMAT "%Y-%m-%d/%H:%M"

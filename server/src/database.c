@@ -4,6 +4,7 @@
 
 #include "database.h"
 #include "define.h"
+#include "server.h"
 #include "json.h"
 #include "ast.h"
 
@@ -27,37 +28,37 @@ DatabaseInfo catalog =
         {
             "CAR_TYPE", 3,
             {
-                {"code",     EXPR_STRING, sizeof (char),         offsetof(CarType, code) },
-                {"tname",    EXPR_STRING, CAR_TYPE_TNAME_LENGTH, offsetof(CarType, tname) },
-                {"quantity", EXPR_INTNUM, sizeof (int),          offsetof(CarType, quantity) }
+                {"code",     EXPR_STRING, sizeof (char),         offsetof (CarType, code) },
+                {"tname",    EXPR_STRING, CAR_TYPE_TNAME_LENGTH, offsetof (CarType, tname) },
+                {"quantity", EXPR_INTNUM, sizeof (int),          offsetof (CarType, quantity) }
             }
         },
         {
             "CAR_INFO", 7,
             {
-                {"cid",        EXPR_INTNUM,    sizeof (int),                 offsetof(CarInfo, cid) },
-                {"plate",      EXPR_STRING,    CAR_INFORMATION_PLATE_LENGTH, offsetof(CarInfo, plate) },
-                {"code",       EXPR_STRING,    sizeof (char),                offsetof(CarInfo, code) },
-                {"cname",      EXPR_STRING,    CAR_INFORMATION_CNAME_LENGTH, offsetof(CarInfo, cname) },
-                {"gear",       EXPR_STRING,    CAR_INFORMATION_GEAR_LENGTH,  offsetof(CarInfo, gear) },
-                {"daily_rent", EXPR_APPROXNUM, sizeof (float),               offsetof(CarInfo, daily_rent) },
-                {"rent",       EXPR_STRING,    sizeof (char),                offsetof(CarInfo, rent) }
+                {"cid",        EXPR_INTNUM,    sizeof (int),                 offsetof (CarInfo, cid) },
+                {"plate",      EXPR_STRING,    CAR_INFORMATION_PLATE_LENGTH, offsetof (CarInfo, plate) },
+                {"code",       EXPR_STRING,    sizeof (char),                offsetof (CarInfo, code) },
+                {"cname",      EXPR_STRING,    CAR_INFORMATION_CNAME_LENGTH, offsetof (CarInfo, cname) },
+                {"gear",       EXPR_STRING,    CAR_INFORMATION_GEAR_LENGTH,  offsetof (CarInfo, gear) },
+                {"daily_rent", EXPR_APPROXNUM, sizeof (float),               offsetof (CarInfo, daily_rent) },
+                {"rent",       EXPR_STRING,    sizeof (char),                offsetof (CarInfo, rent) }
             }
         },
         {
             "RENT_ORDER", 11,
             {
-                {"oid",                    EXPR_STRING,    RENT_ORDER_OID_LENGTH,             offsetof(RentOrder, oid) },
-                {"identity_number",        EXPR_STRING,    RENT_ORDER_IDENTITY_NUMBER_LENGTH, offsetof(RentOrder, identity_number) },
-                {"pname",                  EXPR_STRING,    RENT_ORDER_PNAME_LENGTH,           offsetof(RentOrder, pname) },
-                {"phone_number",           EXPR_STRING,    RENT_ORDER_PHONE_NUMBER_LENGTH,    offsetof(RentOrder, phone_number) },
-                {"cid",                    EXPR_INTNUM,    sizeof (int),                      offsetof(RentOrder, cid) },
-                {"pickup_time",            EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof(RentOrder, pickup_time) },
-                {"scheduled_dropoff_time", EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof(RentOrder, scheduled_dropoff_time) },
-                {"deposit",                EXPR_APPROXNUM, sizeof (float),                    offsetof(RentOrder, deposit) },
-                {"actual_dropoff_time",    EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof(RentOrder, actual_dropoff_time) },
-                {"scheduled_fee",          EXPR_APPROXNUM, sizeof (float),                    offsetof(RentOrder, scheduled_fee) },
-                {"actual_fee",             EXPR_APPROXNUM, sizeof (float),                    offsetof(RentOrder, actual_fee) }
+                {"oid",                    EXPR_STRING,    RENT_ORDER_OID_LENGTH,             offsetof (RentOrder, oid) },
+                {"identity_number",        EXPR_STRING,    RENT_ORDER_IDENTITY_NUMBER_LENGTH, offsetof (RentOrder, identity_number) },
+                {"pname",                  EXPR_STRING,    RENT_ORDER_PNAME_LENGTH,           offsetof (RentOrder, pname) },
+                {"phone_number",           EXPR_STRING,    RENT_ORDER_PHONE_NUMBER_LENGTH,    offsetof (RentOrder, phone_number) },
+                {"cid",                    EXPR_INTNUM,    sizeof (int),                      offsetof (RentOrder, cid) },
+                {"pickup_time",            EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof (RentOrder, pickup_time) },
+                {"scheduled_dropoff_time", EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof (RentOrder, scheduled_dropoff_time) },
+                {"deposit",                EXPR_APPROXNUM, sizeof (float),                    offsetof (RentOrder, deposit) },
+                {"actual_dropoff_time",    EXPR_DATETIME,  RENT_ORDER_TIME_LENGTH,            offsetof (RentOrder, actual_dropoff_time) },
+                {"scheduled_fee",          EXPR_APPROXNUM, sizeof (float),                    offsetof (RentOrder, scheduled_fee) },
+                {"actual_fee",             EXPR_APPROXNUM, sizeof (float),                    offsetof (RentOrder, actual_fee) }
             }
         }
     }
@@ -324,7 +325,83 @@ inline void database_initialize()
     query_initialize();
 }
 
-inline void print_value (ExprNode *val)
+/*
+    计算UTF-8字符串的CJK字符数量
+*/
+inline uint calc_cjk (const char *ustr)
+{
+    uint res = 0;
+    char *p = ustr;
+    while (*p)
+    {
+        if (*p > 0)
+        {
+            ++p;
+        }
+        else if (*p < 0)
+        {
+            if (* (p + 1) < 0 && * (p + 2) < 0)
+            {
+                ++res;
+            }
+            p += 3;
+        }
+    }
+    return res;
+}
+
+/*
+    计算UTF-8字符串的占位宽度, 中文宽度为英文宽度的两倍
+*/
+inline uint ustrlen (const char *ustr)
+{
+    uint len = 0;
+    for (char *p = ustr; *p; ++p)
+    {
+        if (*p > 0)
+        {
+            ++len;
+        }
+        else if (*p < 0)
+        {
+            if (* (p + 1) < 0 && * (p + 2) < 0)
+            {
+                len += 2;
+            }
+            p += 2;
+        }
+    }
+    return len;
+}
+
+inline byte calc_length (RecordCell *rc)
+{
+    static char buf[BUFFER_LENGTH];
+    if (rc == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        switch (rc->type)
+        {
+        case EXPR_INTNUM:
+            sprintf_s (buf, BUFFER_LENGTH, "%d", rc->intval);
+            break;
+        case EXPR_APPROXNUM:
+            sprintf_s (buf, BUFFER_LENGTH, "%.2f", rc->floatval);
+            break;
+        case EXPR_STRING:
+        case EXPR_DATETIME:
+            return ustrlen (rc->strval);
+            break;
+        }
+        return ustrlen (buf);
+    }
+}
+
+
+inline void print_value (ExprNode *val, byte len)
 {
     if (val == NULL)
     {
@@ -335,23 +412,33 @@ inline void print_value (ExprNode *val)
         switch (val->type)
         {
         case EXPR_INTNUM:
-            printf ("%d ", val->intval);
+            printf ("%*d", len, val->intval);
             break;
         case EXPR_APPROXNUM:
-            printf ("%f ", val->floatval);
+            printf ("%*.2f", len, val->floatval);
             break;
         case EXPR_STRING:
         case EXPR_DATETIME:
-            printf ("%s ", val->strval);
+            printf ("%-*s", len + calc_cjk (val->strval), val->strval);
             break;
         }
     }
 }
 
+inline void print_interval_line()
+{
+    for (uint i = 0; i < col_cnt; ++i)
+    {
+        printf ("+");
+        repeat ('-', col_leng[i] + 2);
+    }
+    puts ("+");
+}
+
 char format[JSON_BUFFER_LENGTH];
 inline void print_result (Records *recs)
 {
-    //system ("chcp 65001");
+    op_end = clock();
     memset (format, 0, sizeof (format));
     if (recs == NULL || recs->cnt == 0)
     {
@@ -359,13 +446,42 @@ inline void print_result (Records *recs)
     }
     else
     {
+        uint suml = 0;
+        for (uint j = 0; j < col_cnt; ++j)
+        {
+            col_leng[j] = ustrlen (col_name[j]);
+            for (uint i = 0; i < recs->cnt; ++i)
+            {
+                col_leng[j] = max (col_leng[j], calc_length (& (recs->recs[i].item[j])));
+            }
+            suml += col_leng[j];
+        }
+        // #ifdef DEBUG
+        // for (uint j = 0; j < col_cnt; ++j)
+        // {
+        //     printf ("%d ", col_leng[j]);
+        // }
+        // putchar ('\n');
+        // #endif
+        print_interval_line();
+        for (uint j = 0; j < col_cnt; ++j)
+        {
+            printf ("| %*s ", col_leng[j], col_name[j]);
+        }
+        puts ("|");
+        print_interval_line();
         for (uint i = 0; i < recs->cnt; ++i)
         {
             for (uint j = 0; j < col_cnt; ++j)
             {
-                print_value (& (recs->recs[i].item[j]));
+                printf ("| ");
+                print_value (& (recs->recs[i].item[j]), col_leng[j]);
+                printf (" ");
             }
-            printf("\n");
+            puts ("|");
         }
+        print_interval_line();
+        printf ("%d %s in set (%.2f sec)\n", recs->cnt, recs->cnt > 1 ? "rows" : "row",
+                (op_end - op_start) / CLK_TCK);
     }
 }

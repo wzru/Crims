@@ -1,3 +1,5 @@
+
+
 # SQL Executor Feature List
 
 - [x] SELECT code FROM CAR_TYPE;
@@ -56,6 +58,14 @@
   	FROM RENT_ORDER
     	WHERE pickup_time >= '2019-02-11'
     	AND pickup_time <= '2019-05-12';
+- [ ] SELECT  SUM(CAR_INFO.rent='y') AS "已出租数"
+  		FROM CAR_TYPE, CAR_INFO
+       WHERE CAR_TYPE.code=CAR_INFO.code
+       GROUP BY CAR_TYPE.tname;
+- [ ] SELECT  COUNT(CASE WHEN CAR_INFO.rent='y' THEN 1 END) AS "已出租数"
+  		FROM CAR_TYPE, CAR_INFO
+       WHERE CAR_TYPE.code=CAR_INFO.code
+       GROUP BY CAR_TYPE.tname;
 - [ ] SELECT CAR_TYPE.tname, 
   	   CAR_TYPE.quantity, 
   	   COUNT(CASE WHEN CAR_INFO.rent='y' THEN 1 END) AS "已出租数", 

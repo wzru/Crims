@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
-#include <time.h>
 
 #include "database.h"
 #include "analyze.h"
@@ -18,7 +17,8 @@ Records recs;
 ExprNode error_expr = {EXPR_ERROR};
 uint col_cnt;
 char col_name[RECORD_COLUMNS][EXPR_LENGTH];
-//CarType dbgct;
+byte col_leng[RECORD_COLUMNS];
+clock_t op_start, op_end;
 
 inline int write_message (char *s, ...)
 {
@@ -33,11 +33,15 @@ inline int write_message (char *s, ...)
     }
 }
 
-inline void append_record_table (TableNode *table, Record *rec)
+/*
+    加入一张表table到虚拟表rec中
+    返回值表示过程是否出错
+*/
+inline byte append_record_table (TableNode *table, Record *rec)
 {
     if (table == NULL || rec == NULL)
     {
-        return;
+        return 0;
     }
     if (table->type == TABLE_DEFAULT)
         for (int i = 0; i < DATABASE_TABLE_COUNT; ++i)
@@ -56,15 +60,16 @@ inline void append_record_table (TableNode *table, Record *rec)
                 rec->rtb[i] = rec->cnt;
                 rec->beg[rec->cnt + 1] = rec->beg[rec->cnt] + catalog.tbls[i].cc;
                 ++rec->cnt;
-                return;
+                return 0;
             }
         }
     else
     {
         write_message ("ERROR(%d): Unknown table type.", -UNKNOWN_TABLE);
-        return;
+        return ERROR;
     }
     write_message ("ERROR(%d): Table NOT exists.", -TABLE_NOT_EXIST);
+    return ERROR;
 }
 
 #define move_data(tp)  \
@@ -125,11 +130,17 @@ inline void load_data_recursively (int status, Record *rec, CarTypeNode *ct,
     }
 }
 
+/*
+    加载具体数据
+*/
 inline void load_data (int status, Record *rec)
 {
     return load_data_recursively (status, rec, head->next, NULL, NULL, TYPE_CAR);
 }
 
+/*
+    把虚拟表rec中的若干表的数据加载进来, 以数组形式放在rec->arr[]中
+*/
 inline void load_record (Record *rec)
 {
     if (rec == NULL)
@@ -148,14 +159,22 @@ inline void load_record (Record *rec)
     load_item (rec, 0);
 }
 
-inline void  load_tables (TableNode *table_head, Record *rec)
+/*
+    用table节点构建虚拟表, 存放在rec
+*/
+inline byte load_tables (TableNode *table, Record *rec)
 {
-    while (table_head != NULL)
+    while (table != NULL)
     {
-        append_record_table (table_head, rec);
-        table_head = table_head->next;
+        byte res = append_record_table (table, rec);
+        if (res == ERROR)
+        {
+            return res;
+        }
+        table = table->next;
     }
     load_record (rec);
+    return 0;
 }
 
 inline void swap_byte (char *a, char *b)
@@ -177,9 +196,11 @@ inline int reverse_int (int *x)
     return * (int *) buf;
 }
 
+/*
+    把rec下标从beg开始到cnt-1的表当前对应的数据加载到rec->item[]区域, 便于之后直接进行运算
+*/
 inline void load_item (Record *rec, int beg)
 {
-    //CarType *ct;
     for (int j = beg; j < rec->cnt; ++j)
     {
         for (int k = rec->beg[j]; k < rec->beg[j + 1]; ++k)
@@ -190,8 +211,6 @@ inline void load_item (Record *rec, int beg)
             switch (type)
             {
             case EXPR_INTNUM:
-                //ct = (rec->ptr[j]);
-                //rec->item[k].intval = reverse_int(src);
                 memcpy (& (rec->item[k].intval), src,  sizeof (int));
                 break;
             case EXPR_APPROXNUM:
@@ -199,7 +218,6 @@ inline void load_item (Record *rec, int beg)
                 break;
             case EXPR_STRING:
             case EXPR_DATETIME:
-                //rec->item[k].strval = strdup((char *)src);
                 rec->item[k].strval = calloc (1, ci->size + 1);
                 memcpy (rec->item[k].strval, src, ci->size);
                 break;
@@ -326,7 +344,7 @@ inline ExprNode *make_expr_by_table_column (char *table, char *col, Record *rec)
 inline time_t make_datetime (char *s)
 {
     struct tm tp;
-    memset(&tp, 0, sizeof(tp));
+    memset (&tp, 0, sizeof (tp));
     strptime (s, CRIMS_DATETIME_FORMAT, &tp);
     time_t t = mktime (&tp);
     return t;
@@ -476,7 +494,7 @@ inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select, Record *rec)
         for (uint i = 0; i < subrecs->cnt; ++i)
         {
             res = MAKE_EXPR_EQ (& (subrecs->recs[i].item[0]), expr, rec);
-            if (res && res->type==EXPR_INTNUM && res->intval==1)
+            if (res && res->type == EXPR_INTNUM && res->intval == 1)
             {
                 return res;
             }
@@ -534,7 +552,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         reflect_com (EXPR_LE);
         reflect_com (EXPR_GE);
     case EXPR_NEG:
-        r = evaluate_expr (expr->r, r);
+        r = evaluate_expr (expr->r, rec);
         if (r->type == EXPR_INTNUM)
         {
             res->type = EXPR_INTNUM;
@@ -548,7 +566,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
             return &error_expr;
         }
     case EXPR_NOT:
-        r = evaluate_expr (expr->r, r);
+        r = evaluate_expr (expr->r, rec);
         if (r->type == EXPR_INTNUM)
         {
             res->type = EXPR_INTNUM;
@@ -574,6 +592,8 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         res = is_in_select (expr->l, expr->select, rec);
         res->intval ^= flag;
         return res;
+    // case EXPR_COUNT:
+    // case EXPR_COUNT_ALL:
     default:
         write_message ("ERROR(%d): Unknown expression.", -UNKNOWN_EXPRESSION);
         return &error_expr;
@@ -617,7 +637,7 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
         }
     }
     else
-        while(column_head)
+        while (column_head)
         {
             ExprNode *res = evaluate_expr (column_head, rec);
             if (res == NULL || res->type == EXPR_ERROR)
@@ -645,6 +665,9 @@ inline int get_index_by_table_name (char *table)
     return -1;
 }
 
+/*
+    计算顶层select的列数量, 结果写入全局变量col_cnt和col_name[]
+*/
 inline int calc_col_cnt (TableNode *table_head)
 {
     int res = 0;
@@ -670,6 +693,9 @@ inline int calc_col_cnt (TableNode *table_head)
     return res;
 }
 
+/*
+    加载列名, 用于最后的输出信息, 与求值无关
+*/
 inline void load_column_names (ExprNode *col, TableNode *tbl)
 {
     while (col)
@@ -692,28 +718,44 @@ inline void load_column_names (ExprNode *col, TableNode *tbl)
     }
 }
 
-inline void do_select (SelectNode *select, Record *rec, Records *recs,
+/*
+    select为执行的语句AST节点, rec存放虚拟表的每条查找记录, recs存储查找结果, subq标记这是否是子查询
+    返回值表示过程是否出错
+*/
+inline byte do_select (SelectNode *select, Record *rec, Records *recs,
                        byte subq)
 {
-    load_tables (select->table_head, rec);
+    if (load_tables (select->table_head, rec) == ERROR)
+    {
+        return ERROR;
+    }
     if (!subq)
     {
         load_column_names (select->column_head, select->table_head);
-    }
+    }//如果不是子查询就加载列名, 因为最终输出的列名作用于最顶层的select的
     do
     {
-        if (judge_cond (select->where, rec))
+        byte res = judge_cond (select->where, rec);
+        if (res == ERROR)
+        {
+            return res;
+        }
+        else if (res == 1)
         {
             extract_record (select->column_head, rec, recs);
-            //add_record (rec, recs);
         }
     }
     while (get_next_record (rec));
     select->recs = recs;
+    return 0;
 }
 
+/*
+    执行单句SQL
+*/
 inline int exec_single (char *sql)
 {
+    op_start = clock();
     query_initialize();
     SqlAst *root = parse_sql (sql);
     //print_ast(root, 0);
@@ -727,12 +769,12 @@ inline int exec_single (char *sql)
         // {
         //     return STATUS_ERROR;
         // }
-        do_select (root->select, &rec, &recs, 0);
-        if (crims_status == STATUS_SHELL)
+        byte res = do_select (root->select, &rec, &recs, 0);
+        if (res != ERROR && crims_status == STATUS_SHELL)
         {
             print_result (&recs);
-            return 0;
         }
+        return res;
     }
     else if (root->type == DELETE_STMT)
     {
@@ -820,5 +862,10 @@ inline void query_initialize()
 {
     clear_record (&rec);
     clear_records (&recs);
+    for (uint i = 0; i < col_cnt; ++i)
+    {
+        col_name[i][0] = '\0';
+        col_leng[i] = 0;
+    }
     col_cnt = 0;
 }

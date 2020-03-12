@@ -1,11 +1,13 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <time.h>
+
 #include "define.h"
 #include "ast.h"
 
 extern byte crims_table_column_count[DATABASE_TABLE_COUNT];
-char crims_table_name[DATABASE_TABLE_COUNT][TABLE_NAME_LENGTH];
+//char crims_table_name[DATABASE_TABLE_COUNT][TABLE_NAME_LENGTH];
 
 #define RECORD_COLUMNS 21
 typedef ExprNode RecordCell;
@@ -31,31 +33,28 @@ typedef struct Records
     uint cnt, size;
 } Records;
 
-typedef struct TargetList
-{
-    uint cnt;
-
-};
-
-
 #define RECS_INITIAL_LENGTH 128
 extern Record rec;
 extern Records recs;
 extern uint col_cnt;
 extern char col_name[RECORD_COLUMNS][EXPR_LENGTH];
+extern byte col_leng[RECORD_COLUMNS];
+
+extern clock_t op_start, op_end;
 
 inline int exec (char *command);
 inline int write_message (char *s, ...);
 
 inline void clear_record (Record *rec);
 inline void clear_records (Records *recs);
-inline void append_record_table (TableNode *table, Record *rec);
+inline byte append_record_table (TableNode *table, Record *rec);
 inline void append_record_column (ExprNode *column, Record *rec);
 inline int get_next_record (Record *rec);
 inline int extract_record (ExprNode *column_head, Record *rec, Records *recs);
 inline void add_record (Record *rec, Records *recs);
 inline void query_initialize();
 inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec);
-inline void do_select (SelectNode *select, Record *rec, Records *recs, byte subq);
+inline byte do_select (SelectNode *select, Record *rec, Records *recs,
+                       byte subq);
 
 #endif
