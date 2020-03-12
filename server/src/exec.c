@@ -326,8 +326,10 @@ inline ExprNode *make_expr_by_table_column (char *table, char *col, Record *rec)
 inline time_t make_datetime (char *s)
 {
     struct tm tp;
+    memset(&tp, 0, sizeof(tp));
     strptime (s, CRIMS_DATETIME_FORMAT, &tp);
-    return mktime (&tp);
+    time_t t = mktime (&tp);
+    return t;
 }
 
 #define DEFINE_BINARY_ARI_OP(name, op) inline ExprNode* MAKE_##name(ExprNode *l, ExprNode *r, Record *rec) {\
@@ -342,7 +344,7 @@ inline time_t make_datetime (char *s)
         if(l==NULL || r==NULL) return &error_expr;\
         ExprNode *lhs = evaluate_expr(l, rec), *rhs = evaluate_expr(r, rec), *res = calloc(1, sizeof(ExprNode));\
         if(can_comp(lhs, rhs)) { res->type=EXPR_INTNUM;\
-            if(max(lhs->type, rhs->type)==EXPR_APPROXNUM) {  res->intval = get_number(lhs) op get_number(rhs);}\
+            if(max(lhs->type, rhs->type)<=EXPR_APPROXNUM) {  res->intval = get_number(lhs) op get_number(rhs);}\
             else if(lhs->type==EXPR_STRING && rhs->type==EXPR_STRING){ res->intval = strcmp(lhs->strval, rhs->strval) op 0; }\
             else res->intval = make_datetime(lhs->strval) op make_datetime( rhs->strval);}\
         return res;}
@@ -494,9 +496,10 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     int flag = 0;
     switch (expr->type)
     {
-    case EXPR_STRING:
     case EXPR_INTNUM:
     case EXPR_APPROXNUM:
+    case EXPR_STRING:
+    case EXPR_DATETIME:
     case EXPR_ERROR:
         return expr;
     case EXPR_NAME:

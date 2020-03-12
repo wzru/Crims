@@ -44,15 +44,18 @@
 - [x] SELECT *
   	FROM RENT_ORDER
     	WHERE identity_number="470291339330808704";
-- [ ] SELECT *
+- [x] SELECT *
   	FROM RENT_ORDER
     	WHERE cid IN (SELECT cid
                     FROM CAR_INFO
                     WHERE plate="鄂AW123Q");
-- [ ] SELECT *
+- [x] SELECT *
   	FROM RENT_ORDER
-    	WHERE pickup_time >= '2019/02/11'
-    	AND pickup_time <= '2019/05/12';
+    	WHERE pickup_time <= '2019-02-15/13:05';
+- [x] SELECT *
+  	FROM RENT_ORDER
+    	WHERE pickup_time >= '2019-02-11'
+    	AND pickup_time <= '2019-05-12';
 - [ ] SELECT CAR_TYPE.tname, 
   	   CAR_TYPE.quantity, 
   	   COUNT(CASE WHEN CAR_INFO.rent='y' THEN 1 END) AS "已出租数", 
@@ -97,4 +100,3 @@
          GROUP BY RENT_ORDER.identity_number
          ORDER BY "消费金额" desc 
          LIMIT 10;
-
