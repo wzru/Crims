@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <ctype.h>
 
 #include "database.h"
@@ -15,11 +16,19 @@
 char single_command[COMMAND_BUFFER_LENGTH];
 Record rec;
 Records recs;
-ExprNode error_expr = {.type = EXPR_ERROR}, null_expr = {.type = EXPR_NULL},
-         zero_expr = {.type = EXPR_INTNUM, .intval = 0}, one_expr = {.type = EXPR_INTNUM, .intval = 1};
-uint col_cnt;
+ExprNode error_expr = {.type = EXPR_ERROR},
+         null_expr = {.type = EXPR_NULL},
+         lazy_expr = {.type = EXPR_LAZY},
+         zero_expr = {.type = EXPR_INTNUM, .intval = 0},
+         one_expr = {.type = EXPR_INTNUM, .intval = 1};
+uint col_cnt, vcol_cnt, gcol_cnt;
 char col_name[RECORD_COLUMNS][EXPR_LENGTH];
 byte col_leng[RECORD_COLUMNS];
+byte is_grpby = 0;
+ExprNode *vcol[RECORD_COLUMNS], *gcol[RECORD_COLUMNS];
+byte sc[RECORD_COLUMNS];
+u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS];
+byte query_status;
 clock_t op_start, op_end;
 
 inline int write_message (char *s, ...)
@@ -39,7 +48,7 @@ inline int write_message (char *s, ...)
     加入一张表table到虚拟表rec中
     返回值表示过程是否出错
 */
-inline byte append_record_table (TableNode *table, Record *rec)
+inline int append_record_table (TableNode *table, Record *rec)
 {
     if (table == NULL || rec == NULL)
     {
@@ -471,7 +480,7 @@ inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select, Record *rec)
         subrec = calloc (1, sizeof (Record));
         subrecs = calloc (1, sizeof (Records));
         clear_records (subrecs);
-        do_select (select, subrec, subrecs, 1);
+        do_select (select, subrec, subrecs, 1, 0);
     }
     else
     {
@@ -516,6 +525,17 @@ inline int is_case_expr (u16 type)
     return type == EXPR_CASE_EXPR || type == EXPR_CASE_EXPR_ELSE;
 }
 
+inline int is_agr_func (ExprNode *expr)
+{
+    return expr && expr->type > EXPR_AGR_FUNC_BEGIN
+           && expr->type < EXPR_AGR_FUNC_END;
+}
+
+inline int is_lazy (ExprNode *expr)
+{
+    return expr && expr->type == EXPR_LAZY;
+}
+
 inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
 {
     ExprNode *case_head = case_node->case_head,
@@ -555,6 +575,10 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     }
     ExprNode *l, *r, *res = calloc (1, sizeof (ExprNode));
     int flag = 0;
+    if (is_lazy (expr->l) || is_lazy (expr->r))
+    {
+        return &lazy_expr;
+    }
     switch (expr->type)
     {
     case EXPR_INTNUM:
@@ -563,6 +587,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     case EXPR_DATETIME:
     case EXPR_NULL:
     case EXPR_ERROR:
+    case EXPR_LAZY:
         return expr;
     case EXPR_NAME:
         return make_expr_by_name (expr->strval, rec);
@@ -607,7 +632,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         }
         else
         {
-            write_message ("ERROR(%d): There is no matching operator \%.",
+            write_message ("ERROR(%d): There is no matching operator -.",
                            -NO_MATCHING_OPERATOR);
             return &error_expr;
         }
@@ -621,7 +646,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         }
         else
         {
-            write_message ("ERROR(%d): There is no matching operator \%.",
+            write_message ("ERROR(%d): There is no matching operator ~.",
                            -NO_MATCHING_OPERATOR);
             return &error_expr;
         }
@@ -638,9 +663,17 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         res = is_in_select (expr->l, expr->select, rec);
         res->intval ^= flag;
         return res;
-    // case EXPR_COUNT:
-    // case EXPR_COUNT_ALL:
-    // case EXPR_SUM:
+    case EXPR_COUNT:
+    case EXPR_COUNT_ALL:
+    case EXPR_SUM:
+        if (query_status == QUERY_BEGIN)
+        {
+            return &lazy_expr;
+        }
+        else if (query_status == QUERY_REEVAL)
+        {
+            return & (rec->item[col_cnt + expr->intval]);
+        }
     case EXPR_CASE:
     case EXPR_CASE_ELSE:
     case EXPR_CASE_EXPR:
@@ -674,6 +707,9 @@ inline void append_record_column (ExprNode *val, Record *rec)
     memcpy (&rec->item[ (rec->cnt)++], val, sizeof (ExprNode));
 }
 
+/*
+    将符合where条件的记录求列值, 统计进recs
+*/
 inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
 {
     if (column_head == NULL)
@@ -689,10 +725,11 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
         }
     }
     else
+    {
         while (column_head)
         {
             ExprNode *res = evaluate_expr (column_head, rec);
-            if (res == NULL || res->type == EXPR_ERROR)
+            if (is_error (res))
             {
                 return ERROR;
             }
@@ -702,6 +739,34 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
             }
             column_head = column_head->next;
         }
+        if (is_grpby)
+        {
+            for (uint i = 0; i < vcol_cnt; ++i)
+            {
+                ExprNode *res = evaluate_expr (vcol[i], rec);
+                if (is_error (res))
+                {
+                    return ERROR;
+                }
+                else
+                {
+                    append_record_column (res, target);
+                }
+            }
+            for (uint i = 0; i < gcol_cnt; ++i)
+            {
+                ExprNode *res = evaluate_expr (gcol[i], rec);
+                if (is_error (res))
+                {
+                    return ERROR;
+                }
+                else
+                {
+                    append_record_column (res, target);
+                }
+            }
+        }
+    }
     add_record (target, recs);
     return 0;
 }
@@ -778,12 +843,166 @@ inline void load_column_names (ExprNode *col, TableNode *tbl)
     }
 }
 
+inline int extract_agr (ExprNode *expr)
+{
+    if (expr == NULL)
+    {
+        return 0;
+    }
+    if (is_agr_func (expr))
+    {
+        vcol[vcol_cnt] = expr->r;
+        vcol_prop[vcol_cnt] = expr->type;
+        expr->intval = vcol_cnt++;
+        return 1;
+    }
+    return extract_agr (expr->l) || extract_agr (expr->r);
+}
+
+inline void build_agr_col (ExprNode *col)
+{
+    for (uint i = 0; i < col_cnt; ++i)
+    {
+        col_prop[i] = extract_agr (col);
+        col = col->next;
+    }
+}
+
+inline ExprNode *transform_op_expr (ExprNode *grp)
+{
+    if (grp == NULL)
+    {
+        return NULL;
+    }
+    ExprNode *expr = calloc (1, sizeof (ExprNode));
+    memcpy (expr, grp, sizeof (ExprNode));
+    expr->type = expr->op;
+    return expr;
+}
+
+inline void build_grp_col (ExprNode *grp)
+{
+    while (grp)
+    {
+        gcol[gcol_cnt++] = grp;
+        //gcol[gcol_cnt++] = transform_op_expr (grp);
+        grp = grp->next;
+    }
+}
+
+inline int cmp_g (Record *rec1, Record *rec2)
+{
+    for (uint i = 0; i < gcol_cnt; ++i)
+    {
+        if (is_true (MAKE_EXPR_NE (& (rec1->item[i + col_cnt + vcol_cnt]),
+                                   & (rec2->item[i + col_cnt + vcol_cnt]),
+                                   NULL)))
+        {
+            if (is_true (MAKE_EXPR_LT (& (rec1->item[i + col_cnt + vcol_cnt]),
+                                       & (rec2->item[i + col_cnt + vcol_cnt]),
+                                       NULL)
+                        ) ^ sc[i])
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+
+inline ExprNode *make_int_expr (int x)
+{
+    ExprNode *expr = calloc (1, sizeof (ExprNode));
+    expr->type = EXPR_INTNUM;
+    expr->intval = x;
+    return expr;
+}
+
+inline void merge_item_left (ExprNode *lhs, ExprNode *rhs, u16 type,
+                             uint beg, uint end)
+{
+    ExprNode *res = lhs;
+    switch (type)
+    {
+    case EXPR_COUNT_ALL://这个直接不管, 可以特殊处理
+    case EXPR_COUNT://同上
+        res = make_int_expr (end - beg + 1);
+        break;
+    case EXPR_SUM:
+        res = MAKE_EXPR_ADD (lhs, rhs, NULL);
+        break;
+    }
+    memcpy (lhs, res, sizeof (ExprNode));
+}
+
+inline ExprNode *get_col_by_index (ExprNode *col_head, uint id)
+{
+    for (uint i = 0; i < id; ++i)
+    {
+        col_head = col_head->next;
+    }
+    return col_head;
+}
+
+inline int merge_agr (Records *recs, ExprNode *col_head)
+{
+    uint beg = 0, end = 1;
+    while (end < recs->cnt)
+    {
+        int res = cmp_g (& (recs->recs[beg]), & (recs->recs[end]));
+        if (res != 0)
+        {
+            for (uint i = 0; i < vcol_cnt; ++i)
+            {
+                for (uint j = beg + 1; j < end; ++j)
+                {
+                    merge_item_left (& (recs->recs[beg].item[i + col_cnt]),
+                                     & (recs->recs[j].item[i + col_cnt]),
+                                     vcol_prop[i], beg, j);
+                }
+            }
+            for (uint i = 0; i < col_cnt; ++i)
+                if (col_prop[i])
+                {
+                    ExprNode *res = evaluate_expr (get_col_by_index (col_head, i),
+                                                   & (recs->recs[beg]));
+                    memcpy (& (recs->recs[beg].item[i]), res, sizeof (ExprNode));
+                }
+            recs->recs[beg].next = end;
+            beg = end;
+        }
+        ++end;
+    }
+    for (uint i = 0; i < vcol_cnt; ++i)
+    {
+        for (uint j = beg + 1; j < recs->cnt; ++j)
+        {
+            merge_item_left (& (recs->recs[beg].item[i + col_cnt]),
+                             & (recs->recs[j].item[i + col_cnt]),
+                             vcol_prop[i], beg, j);
+        }
+    }
+    for (uint i = 0; i < col_cnt; ++i)
+        if (col_prop[i])
+        {
+            ExprNode *res = evaluate_expr (get_col_by_index (col_head, i),
+                                           & (recs->recs[beg]));
+            memcpy (& (recs->recs[beg].item[i]), res, sizeof (ExprNode));
+        }
+    recs->recs[beg].next = recs->cnt;
+    return 0;
+}
+
 /*
     select为执行的语句AST节点, rec存放虚拟表的每条查找记录, recs存储查找结果, subq标记这是否是子查询
     返回值表示过程是否出错
 */
-inline byte do_select (SelectNode *select, Record *rec, Records *recs,
-                       byte subq)
+inline int do_select (SelectNode *select, Record *rec, Records *recs,
+                      byte subq, byte grpby)
 {
     if (load_tables (select->table_head, rec) == ERROR)
     {
@@ -793,9 +1012,14 @@ inline byte do_select (SelectNode *select, Record *rec, Records *recs,
     {
         load_column_names (select->column_head, select->table_head);
     }//如果不是子查询就加载列名, 因为最终输出的列名作用于最顶层的select的
+    if (grpby)
+    {
+        build_agr_col (select->column_head);
+        build_grp_col (select->group);
+    }//将聚合函数单独找出来
     do
     {
-        byte res = judge_cond (select->where, rec);
+        int res = judge_cond (select->where, rec);
         if (res == ERROR)
         {
             return res;
@@ -806,6 +1030,16 @@ inline byte do_select (SelectNode *select, Record *rec, Records *recs,
         }
     }
     while (get_next_record (rec));
+    if (grpby)
+    {
+        query_status = QUERY_REEVAL;
+        qsort (recs->recs, recs->cnt, sizeof (Record), cmp_g);
+        int res = merge_agr (recs, select->column_head);
+        if (res == ERROR)
+        {
+            return res;
+        }
+    }
     select->recs = recs;
     return 0;
 }
@@ -829,7 +1063,8 @@ inline int exec_single (char *sql)
         // {
         //     return STATUS_ERROR;
         // }
-        byte res = do_select (root->select, &rec, &recs, 0);
+        byte res = do_select (root->select, &rec, &recs, 0,
+                              is_grpby = (root->select->group != NULL));
         if (res != ERROR && crims_status == STATUS_SHELL)
         {
             print_result (&recs);
@@ -931,4 +1166,9 @@ inline void query_initialize()
         col_leng[i] = 0;
     }
     col_cnt = 0;
+    is_grpby = 0;
+    vcol_cnt = 0;
+    gcol_cnt = 0;
+    memset (sc, 0, sizeof (sc));
+    query_status = QUERY_BEGIN;
 }

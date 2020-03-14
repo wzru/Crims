@@ -9,7 +9,7 @@
 extern byte crims_table_column_count[DATABASE_TABLE_COUNT];
 //char crims_table_name[DATABASE_TABLE_COUNT][TABLE_NAME_LENGTH];
 
-#define RECORD_COLUMNS 21
+#define RECORD_COLUMNS 30
 typedef ExprNode RecordCell;
 typedef struct Record
 {
@@ -24,6 +24,7 @@ typedef struct Record
     void *ptr[DATABASE_TABLE_COUNT];
     int siz[DATABASE_TABLE_COUNT];
     void *arr[DATABASE_TABLE_COUNT];
+    uint next;
 } Record;
 
 extern ExprNode error_expr, null_expr, zero_expr, one_expr;
@@ -34,12 +35,23 @@ typedef struct Records
     uint cnt, size;
 } Records;
 
+enum
+{
+    QUERY_BEGIN,
+    QUERY_REEVAL
+};
+
 #define RECS_INITIAL_LENGTH 128
 extern Record rec;
 extern Records recs;
-extern uint col_cnt;
+extern uint col_cnt, vcol_cnt, gcol_cnt;
 extern char col_name[RECORD_COLUMNS][EXPR_LENGTH];
 extern byte col_leng[RECORD_COLUMNS];
+extern byte is_grpby;
+extern ExprNode *vcol[RECORD_COLUMNS], *gcol[RECORD_COLUMNS];
+extern byte sc[RECORD_COLUMNS];
+extern u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS];
+extern byte query_status;
 
 extern clock_t op_start, op_end;
 
@@ -49,14 +61,14 @@ inline int write_message (char *s, ...);
 inline void load_item (Record *rec, int beg);
 inline void clear_record (Record *rec);
 inline void clear_records (Records *recs);
-inline byte append_record_table (TableNode *table, Record *rec);
+inline int append_record_table (TableNode *table, Record *rec);
 inline void append_record_column (ExprNode *column, Record *rec);
 inline int get_next_record (Record *rec);
 inline int extract_record (ExprNode *column_head, Record *rec, Records *recs);
 inline void add_record (Record *rec, Records *recs);
 inline void query_initialize();
 inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec);
-inline byte do_select (SelectNode *select, Record *rec, Records *recs,
-                       byte subq);
+inline int do_select (SelectNode *select, Record *rec, Records *recs,
+                      byte subq, byte grpby);
 
 #endif

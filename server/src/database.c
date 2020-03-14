@@ -435,6 +435,8 @@ inline void print_interval_line()
     puts ("+");
 }
 
+#define next(i) (is_grpby?recs->recs[i].next:((i)+1))
+
 char format[JSON_BUFFER_LENGTH];
 inline void print_result (Records *recs)
 {
@@ -470,7 +472,7 @@ inline void print_result (Records *recs)
         }
         puts ("|");
         print_interval_line();
-        for (uint i = 0; i < recs->cnt; ++i)
+        for (uint i = 0; i < recs->cnt; i = next (i))
         {
             for (uint j = 0; j < col_cnt; ++j)
             {

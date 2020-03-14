@@ -378,10 +378,9 @@ SELECT CAR_TYPE.tname,
 
 ```sql
 SELECT CAR_TYPE.tname, SUM(RENT_ORDER.actual_fee)
-    FROM CAR_TYPE, RENT_ORDER
-    WHERE CAR_TYPE.code = (SELECT CAR_INFO.code 
-                           FROM CAR_INFO 
-                           WHERE cid=RENT_ORDER.cid) 
+    FROM CAR_TYPE, CAR_INFO, RENT_ORDER
+    WHERE CAR_TYPE.code = CAR_INFO.code
+    AND CAR_INFO.cid = RENT_ORDER.cid
     AND RENT_ORDER.pickup_time > '2019/2/1' 
     AND RENT_ORDER.pickup_time < '2019/2/28'
     GROUP BY CAR_TYPE.tname;
