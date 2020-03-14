@@ -30,6 +30,8 @@ void get_locale_strings(void);
 #include <string.h>
 #include <time.h>
 
+#include "strptime.h"
+
 #define match_char(ch1, ch2) if (ch1 != ch2) return NULL
 
 #ifndef Macintosh

@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "server.h"
+#include "exec.h"
 
 //#pragma comment(lib,"ws2_32.lib")
 

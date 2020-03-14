@@ -8,14 +8,16 @@ set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin")
 
 aux_source_directory(./src DIR_SRCS)
 include_directories(./include)
+link_directories("${PROJECT_SOURCE_DIR}/lib") #必须在add_executable之前
 
-add_compile_options(-Wall -g -fgnu89-inline --std=c11 -static)
+add_compile_options(-g -fgnu89-inline --std=c11 -static)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   add_definitions(-DDEBUG) 
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+  add_compile_options(-O2)
 endif(CMAKE_BUILD_TYPE MATCHES Debug)
 
-link_directories("${PROJECT_SOURCE_DIR}/lib") #必须在add_executable之前
 add_executable(crims_server ${DIR_SRCS})
 
 if(WIN32)

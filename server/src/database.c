@@ -328,7 +328,7 @@ inline void database_initialize()
 /*
     计算UTF-8字符串的CJK字符数量
 */
-inline uint calc_cjk (const char *ustr)
+inline uint calc_cjk (char *ustr)
 {
     uint res = 0;
     char *p = ustr;
@@ -466,7 +466,7 @@ inline void print_result (Records *recs)
         print_interval_line();
         for (uint j = 0; j < col_cnt; ++j)
         {
-            printf ("| %*s ", col_leng[j], col_name[j]);
+            printf ("| %*s ", col_leng[j] + calc_cjk (col_name[j]), col_name[j]);
         }
         puts ("|");
         print_interval_line();

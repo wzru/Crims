@@ -101,6 +101,4 @@ extern byte crims_status;
     #define min(a,b) ((a)>(b)?(b):(a))
 #endif
 
-#define CRIMS_DATETIME_FORMAT "%Y-%m-%d/%H:%M"
-
 #endif

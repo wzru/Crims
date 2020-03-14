@@ -58,6 +58,7 @@ enum TYPE_ID
     DELETE_STMT,
     INSERT_STMT,
     UPDATE_STMT,
+    EXPR_NULL,
     EXPR_ERROR
 };
 

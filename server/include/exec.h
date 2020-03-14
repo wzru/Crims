@@ -25,7 +25,8 @@ typedef struct Record
     int siz[DATABASE_TABLE_COUNT];
     void *arr[DATABASE_TABLE_COUNT];
 } Record;
-extern ExprNode error_expr;
+
+extern ExprNode error_expr, null_expr, zero_expr, one_expr;
 
 typedef struct Records
 {
@@ -45,6 +46,7 @@ extern clock_t op_start, op_end;
 inline int exec (char *command);
 inline int write_message (char *s, ...);
 
+inline void load_item (Record *rec, int beg);
 inline void clear_record (Record *rec);
 inline void clear_records (Records *recs);
 inline byte append_record_table (TableNode *table, Record *rec);

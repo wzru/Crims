@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "database.h"
+#include "strptime.h"
 #include "analyze.h"
 #include "server.h"
 #include "shell.h"
@@ -14,7 +15,8 @@
 char single_command[COMMAND_BUFFER_LENGTH];
 Record rec;
 Records recs;
-ExprNode error_expr = {EXPR_ERROR};
+ExprNode error_expr = {.type = EXPR_ERROR}, null_expr = {.type = EXPR_NULL},
+         zero_expr = {.type = EXPR_INTNUM, .intval = 0}, one_expr = {.type = EXPR_INTNUM, .intval = 1};
 uint col_cnt;
 char col_name[RECORD_COLUMNS][EXPR_LENGTH];
 byte col_leng[RECORD_COLUMNS];
@@ -90,11 +92,9 @@ inline void load_data_recursively (int status, Record *rec, CarTypeNode *ct,
         }
         if (check_need (status, TYPE_CAR))
         {
-            //memcpy(&dbgct, &(ct->ct), isiz[type]);
             memcpy (rec->ptr[rec->rtb[type]] + isiz[type] * (rec->siz[rec->rtb[type]]),
                     & (ct->ct), isiz[type]);
             ++ (rec->siz[rec->rtb[type]]);
-            //move_data (ct);
         }
         load_data_recursively (status, rec, ct, ct->head->next, ro, TYPE_INFO);
         break;
@@ -105,11 +105,9 @@ inline void load_data_recursively (int status, Record *rec, CarTypeNode *ct,
         }
         if (check_need (status, TYPE_INFO))
         {
-            //CarInfo *dest = rec->ptr[rec->rtb[type]] + isiz[type] * (rec->siz[rec->rtb[type]]);
             memcpy (rec->ptr[rec->rtb[type]] + isiz[type] * (rec->siz[rec->rtb[type]]),
                     & (ci->ci), isiz[type]);
             ++ (rec->siz[rec->rtb[type]]);
-            //move_data (ci);
         }
         load_data_recursively (status, rec, ct, ci, ci->head->next, TYPE_ORDER);
         break;
@@ -123,7 +121,6 @@ inline void load_data_recursively (int status, Record *rec, CarTypeNode *ct,
             memcpy (rec->ptr[rec->rtb[type]] + isiz[type] * (rec->siz[rec->rtb[type]]),
                     & (ro->ro), isiz[type]);
             ++ (rec->siz[rec->rtb[type]]);
-            //move_data (ro);
         }
         load_data_recursively (status, rec, ct, ci, ro->next, TYPE_ORDER);
         break;
@@ -283,7 +280,7 @@ inline int get_index_by_name (char *name, Record *rec)
 inline int get_index_by_table_column (char *table, char *column, Record *rec)
 {
     int cnt = 0, res = -1;
-    for (uint i = 0; i < rec->cnt; ++i)
+    for (uint i = 0; i < rec->beg[rec->cnt]; ++i)
     {
         if (!stricmp (column, rec->name[i]) && (!stricmp (table, rec->table[i])
                                                 || !stricmp (table, rec->alias[i])))
@@ -354,7 +351,7 @@ inline time_t make_datetime (char *s)
         if (l == NULL || r == NULL) return &error_expr; \
         ExprNode *lhs = evaluate_expr (l, rec), *rhs = evaluate_expr (r, rec), *res = calloc(1,sizeof(ExprNode));\
         if (can_asmd (lhs) && can_asmd (rhs)){ \
-            if (max (lhs->type, rhs->type) == EXPR_APPROXNUM){res->type = EXPR_APPROXNUM; res->floatval = get_number (lhs) + get_number (rhs);}\
+            if (max (lhs->type, rhs->type) == EXPR_APPROXNUM){res->type = EXPR_APPROXNUM; res->floatval = get_number (lhs) op get_number (rhs);}\
             else{ res->type = EXPR_INTNUM;res->intval = lhs->intval op rhs->intval;}}\
         return res;}
 
@@ -444,7 +441,7 @@ inline ExprNode *is_in_val_list (ExprNode *expr, ExprNode *list, Record *rec)
                 }
                 break;
             case EXPR_STRING:
-                if (!strcmp (expr->strval, tmp.strval))
+                if (!stricmp (expr->strval, tmp.strval))
                 {
                     return res;
                 }
@@ -504,6 +501,52 @@ inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select, Record *rec)
     return res;
 }
 
+inline int is_error (ExprNode *expr)
+{
+    return !expr || expr->type == EXPR_ERROR;
+}
+
+inline int is_true (ExprNode *expr)
+{
+    return expr && expr->type == EXPR_INTNUM && expr->intval == 1;
+}
+
+inline int is_case_expr (u16 type)
+{
+    return type == EXPR_CASE_EXPR || type == EXPR_CASE_EXPR_ELSE;
+}
+
+inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
+{
+    ExprNode *case_head = case_node->case_head,
+              *expr = evaluate_expr (case_node->l, rec),
+               *res;
+    u16 type = case_node->type;
+    if (is_case_expr (type) && is_error (expr))
+    {
+        return &error_expr;
+    }
+    while (case_head)
+    {
+        ExprNode *l = evaluate_expr (case_head->l, rec),
+                  *r = evaluate_expr (case_head->r, rec);
+        if (is_error (l) || is_error (r))
+        {
+            return &error_expr;
+        }
+        res = is_case_expr (type) ? MAKE_EXPR_EQ (expr, l, rec) : l;
+        if (is_error (res))
+        {
+            return &error_expr;
+        }
+        else if (is_true (res))
+        {
+            return r;
+        }
+        case_head = case_head->next;
+    }
+}
+
 inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
 {
     if (expr == NULL)
@@ -518,6 +561,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     case EXPR_APPROXNUM:
     case EXPR_STRING:
     case EXPR_DATETIME:
+    case EXPR_NULL:
     case EXPR_ERROR:
         return expr;
     case EXPR_NAME:
@@ -532,7 +576,9 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         l = evaluate_expr (expr->l, rec), r = evaluate_expr (expr->r, rec);
         if (l->type == EXPR_INTNUM && r->type == EXPR_INTNUM)
         {
-            return l->intval % r->intval;
+            res->type = EXPR_INTNUM;
+            res->intval = l->intval % r->intval;
+            return res;
         }
         else
         {
@@ -594,6 +640,12 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         return res;
     // case EXPR_COUNT:
     // case EXPR_COUNT_ALL:
+    // case EXPR_SUM:
+    case EXPR_CASE:
+    case EXPR_CASE_ELSE:
+    case EXPR_CASE_EXPR:
+    case EXPR_CASE_EXPR_ELSE:
+        return evaluate_case (expr, rec);
     default:
         write_message ("ERROR(%d): Unknown expression.", -UNKNOWN_EXPRESSION);
         return &error_expr;
@@ -651,6 +703,7 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
             column_head = column_head->next;
         }
     add_record (target, recs);
+    return 0;
 }
 
 inline int get_index_by_table_name (char *table)
@@ -712,7 +765,14 @@ inline void load_column_names (ExprNode *col, TableNode *tbl)
             {
                 write_message ("No column name can be used.");
             }
-            strcat (col_name[col_cnt++], col->text);
+            if (col->alias && strlen (col->alias))
+            {
+                strcat (col_name[col_cnt++], col->alias);
+            }
+            else
+            {
+                strcat (col_name[col_cnt++], col->text);
+            }
         }
         col = col->next;
     }
@@ -782,6 +842,7 @@ inline int exec_single (char *sql)
         // {
         //     return STATUS_ERROR;
         // }
+        return 0;
     }
     else if (root->type == INSERT_STMT)
     {
@@ -789,6 +850,7 @@ inline int exec_single (char *sql)
         // {
         //     return STATUS_ERROR;
         // }
+        return 0;
     }
     else if (root->type == UPDATE_STMT)
     {
@@ -796,6 +858,7 @@ inline int exec_single (char *sql)
         // {
         //     return STATUS_ERROR;
         // }
+        return 0;
     }
     else
     {

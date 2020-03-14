@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "database.h"
 #include "analyze.h"
 #include "ast.h"

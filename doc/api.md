@@ -8,7 +8,7 @@
 
 ## CSQL 
 
-**Crims Structured Query Language(CSQL)**是SQL的一门方言，是专为Crims设计的一门DSL。CSQL**大小写敏感**。  
+**Crims Structured Query Language(CSQL)**是SQL的一门方言，是专为Crims设计的一门DSL。CSQL大小写不敏感。  
 
 ### TYPE
 
@@ -367,8 +367,8 @@ SELECT *
 ```sql
 SELECT CAR_TYPE.tname, 
 	   CAR_TYPE.quantity, 
-	   COUNT(CASE WHEN CAR_INFO.rent='y' THEN 1 END) AS "已出租数", 
-	   COUNT(CASE WHEN CAR_INFO.rent='n' THEN 1 END) AS "未出租数"
+	   SUM(CAR_INFO.rent='y') AS "已出租数", 
+	   SUM(CAR_INFO.rent='n') AS "未出租数"
 	FROM CAR_TYPE, CAR_INFO
     WHERE CAR_TYPE.code=CAR_INFO.code
     GROUP BY CAR_TYPE.tname;

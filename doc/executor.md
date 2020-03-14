@@ -1,5 +1,3 @@
-
-
 # SQL Executor Feature List
 
 - [x] SELECT code FROM CAR_TYPE;
@@ -39,6 +37,10 @@
   	FROM CAR_INFO
     	WHERE cname = "别克英朗" 
     	AND rent="y";
+- [ ] SELECT cid, cname AS "名字", daily_rent*30 AS "包月价格"
+  	FROM CAR_INFO
+    	WHERE cname = "别克英朗" 
+    	AND rent="y";
 - [x] SELECT *
   	FROM CAR_INFO
     	WHERE cname = "别克英朗" 
@@ -55,15 +57,16 @@
   	FROM RENT_ORDER
     	WHERE pickup_time <= '2019-02-15/13:05';
 - [x] SELECT *
-  	FROM RENT_ORDER
+  	     FROM RENT_ORDER
     	WHERE pickup_time >= '2019-02-11'
     	AND pickup_time <= '2019-05-12';
+- [ ] SELECT CAR_TYPE.code FROM CAR_TYPE, CAR_INFO WHERE CAR_TYPE.code=CAR_INFO.code;
 - [ ] SELECT  SUM(CAR_INFO.rent='y') AS "已出租数"
-  		FROM CAR_TYPE, CAR_INFO
+       FROM CAR_TYPE, CAR_INFO
        WHERE CAR_TYPE.code=CAR_INFO.code
        GROUP BY CAR_TYPE.tname;
 - [ ] SELECT  COUNT(CASE WHEN CAR_INFO.rent='y' THEN 1 END) AS "已出租数"
-  		FROM CAR_TYPE, CAR_INFO
+       FROM CAR_TYPE, CAR_INFO
        WHERE CAR_TYPE.code=CAR_INFO.code
        GROUP BY CAR_TYPE.tname;
 - [ ] SELECT CAR_TYPE.tname, 
@@ -81,6 +84,13 @@
       AND RENT_ORDER.pickup_time > '2019/2/1' 
       AND RENT_ORDER.pickup_time < '2019/2/28'
       GROUP BY CAR_TYPE.tname;
+- [ ] SELECT CAR_INFO.plate, 
+  	   CAR_INFO.cname, 
+  	   SUM(RENT_ORDER.actual_fee) AS "营业额", 
+         1/SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "租用率"
+         FROM CAR_INFO, RENT_ORDER
+         WHERE CAR_INFO.cid=RENT_ORDER.cid
+         GROUP BY CAR_INFO.plate;
 - [ ] SELECT CAR_INFO.plate, 
   	   CAR_INFO.cname, 
   	   SUM(RENT_ORDER.actual_fee) AS "营业额", 

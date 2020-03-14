@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <locale.h>
 
 #include "shell.h"
 #include "exec.h"
@@ -18,7 +19,9 @@ inline int shell (int argc, char *argv[])
 {
     database_initialize();
     system ("chcp 65001");
-    system ("cls");
+    // setlocale(LC_ALL,".65001");
+    // #pragma setlocale(".65001")
+    //system ("cls");
     while (1)
     {
         print_command_prompt();
