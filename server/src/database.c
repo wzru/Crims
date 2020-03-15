@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "database.h"
 #include "define.h"
@@ -438,9 +439,11 @@ inline void print_interval_line()
 #define next(i) (is_grpby?recs->recs[i].next:((i)+1))
 
 char format[JSON_BUFFER_LENGTH];
+Records result;
 inline void print_result (Records *recs)
 {
     op_end = clock();
+    clear_records (&result);
     uint row_cnt = 0;
     memset (format, 0, sizeof (format));
     if (recs == NULL || recs->cnt == 0)
@@ -475,10 +478,19 @@ inline void print_result (Records *recs)
         print_interval_line();
         for (uint i = 0; i < recs->cnt; i = next (i))
         {
+            add_record (& (recs->recs[i]), &result);
+        }
+        if (is_odrby)
+        {
+            qsort (result.recs, result.cnt, sizeof (Record), cmp_o);
+        }
+        for (uint i = limit.start, cnt = 0; i < result.cnt
+                && cnt < limit.count; ++i, ++cnt)
+        {
             for (uint j = 0; j < col_cnt; ++j)
             {
                 printf ("| ");
-                print_value (& (recs->recs[i].item[j]), col_leng[j]);
+                print_value (& (result.recs[i].item[j]), col_leng[j]);
                 printf (" ");
             }
             puts ("|");

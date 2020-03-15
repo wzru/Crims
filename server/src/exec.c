@@ -14,6 +14,7 @@
 #include "ast.h"
 
 char single_command[COMMAND_BUFFER_LENGTH];
+
 Record rec;
 Records recs;
 ExprNode error_expr = {.type = EXPR_ERROR},
@@ -21,14 +22,17 @@ ExprNode error_expr = {.type = EXPR_ERROR},
          lazy_expr = {.type = EXPR_LAZY},
          zero_expr = {.type = EXPR_INTNUM, .intval = 0},
          one_expr = {.type = EXPR_INTNUM, .intval = 1};
-uint col_cnt, vcol_cnt, gcol_cnt;
+uint col_cnt, vcol_cnt, gcol_cnt, ocol_cnt;
 char col_name[RECORD_COLUMNS][EXPR_LENGTH];
 byte col_leng[RECORD_COLUMNS];
-byte is_grpby = 0;
-ExprNode *vcol[RECORD_COLUMNS], *gcol[RECORD_COLUMNS];
-byte sc[RECORD_COLUMNS];
-u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS];
+byte is_grpby = 0, is_odrby = 0, is_limit = 0;
+LimitNode limit;
+ExprNode *vcol[RECORD_COLUMNS], *gcol[RECORD_COLUMNS], *ocol[RECORD_COLUMNS];
+byte gsc[RECORD_COLUMNS], osc[RECORD_COLUMNS];
+u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS],
+    ocol_prop[RECORD_COLUMNS];
 byte query_status;
+
 clock_t op_start, op_end;
 
 inline int write_message (char *s, ...)
@@ -358,7 +362,7 @@ inline time_t make_datetime (char *s)
 
 #define DEFINE_BINARY_ARI_OP(name, op) inline ExprNode* MAKE_##name(ExprNode *l, ExprNode *r, Record *rec) {\
         if (l == NULL || r == NULL) return &error_expr; \
-        ExprNode *lhs = evaluate_expr (l, rec), *rhs = evaluate_expr (r, rec), *res = calloc(1,sizeof(ExprNode));\
+        ExprNode *lhs = eval_expr (l, rec), *rhs = eval_expr (r, rec), *res = calloc(1,sizeof(ExprNode));\
         if(is_lazy(lhs) || is_lazy(rhs)) return &lazy_expr;\
         if (can_asmd (lhs) && can_asmd (rhs)){ \
             if (max (lhs->type, rhs->type) == EXPR_APPROXNUM){res->type = EXPR_APPROXNUM; res->floatval = get_number (lhs) op get_number (rhs);}\
@@ -367,7 +371,7 @@ inline time_t make_datetime (char *s)
 
 #define DEFINE_BINARY_COM_OP(name, op) inline ExprNode* MAKE_##name(ExprNode *l, ExprNode *r, Record *rec) {\
         if(l==NULL || r==NULL) return &error_expr;\
-        ExprNode *lhs = evaluate_expr(l, rec), *rhs = evaluate_expr(r, rec), *res = calloc(1, sizeof(ExprNode));\
+        ExprNode *lhs = eval_expr(l, rec), *rhs = eval_expr(r, rec), *res = calloc(1, sizeof(ExprNode));\
         if(is_lazy(lhs) || is_lazy(rhs)) return &lazy_expr;\
         if(can_comp(lhs, rhs)) { res->type=EXPR_INTNUM;\
             if(max(lhs->type, rhs->type)<=EXPR_APPROXNUM) {  res->intval = get_number(lhs) op get_number(rhs);}\
@@ -388,9 +392,9 @@ DEFINE_BINARY_COM_OP (EXPR_LE, <=)
 DEFINE_BINARY_COM_OP (EXPR_GE, >=)
 
 #define reflect_ari(type) case type:\
-    return MAKE_##type(evaluate_expr (expr->l, rec), evaluate_expr (expr->r,rec), rec);
+    return MAKE_##type(eval_expr (expr->l, rec), eval_expr (expr->r,rec), rec);
 #define reflect_com(type) case type:\
-    return MAKE_##type(evaluate_expr(expr->l, rec), evaluate_expr(expr->r, rec), rec);
+    return MAKE_##type(eval_expr(expr->l, rec), eval_expr(expr->r, rec), rec);
 
 inline ExprNode *calc_logic (uint type, ExprNode *l, ExprNode *r)
 {
@@ -424,14 +428,14 @@ inline ExprNode *is_in_val_list (ExprNode *expr, ExprNode *list, Record *rec)
     ExprNode *res = calloc (1, sizeof (ExprNode)), tmp;
     res->type = EXPR_INTNUM;
     res->intval = 1;
-    expr = evaluate_expr (expr, rec);
+    expr = eval_expr (expr, rec);
     if (expr->type == EXPR_ERROR)
     {
         return &error_expr;
     }
     while (list)
     {
-        tmp = *evaluate_expr (list, rec);
+        tmp = *eval_expr (list, rec);
         if (tmp.type == EXPR_ERROR)
         {
             return &error_expr;
@@ -482,7 +486,7 @@ inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select, Record *rec)
         subrec = calloc (1, sizeof (Record));
         subrecs = calloc (1, sizeof (Records));
         clear_records (subrecs);
-        do_select (select, subrec, subrecs, 1, 0);
+        do_select (select, subrec, subrecs, 1, 0, 0);
     }
     else
     {
@@ -571,10 +575,10 @@ inline ExprNode *make_float_expr (float f)
     return expr;
 }
 
-inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
+inline ExprNode *eval_case (ExprNode *case_node, Record *rec)
 {
     ExprNode *case_head = case_node->case_head,
-              *expr = evaluate_expr (case_node->l, rec),
+              *expr = eval_expr (case_node->l, rec),
                *res;
     u16 type = case_node->type;
     if (is_case_expr (type) && is_error (expr))
@@ -583,8 +587,8 @@ inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
     }
     while (case_head)
     {
-        ExprNode *l = evaluate_expr (case_head->l, rec),
-                  *r = evaluate_expr (case_head->r, rec);
+        ExprNode *l = eval_expr (case_head->l, rec),
+                  *r = eval_expr (case_head->r, rec);
         if (is_error (l) || is_error (r))
         {
             return &error_expr;
@@ -602,7 +606,7 @@ inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
     }
 }
 
-inline ExprNode *evaluate_func (ExprNode *func, Record *rec)
+inline ExprNode *eval_func (ExprNode *func, Record *rec)
 {
     ExprNode *a0, *a1, *a2, *t1, *t2;
     if (!stricmp (func->strval, "TIMESTAMPDIFF"))
@@ -611,7 +615,7 @@ inline ExprNode *evaluate_func (ExprNode *func, Record *rec)
         if (a0 && a0->next && a0->next->next)
         {
             a1 = transform_op_expr (a0->next), a2 = transform_op_expr (a1->next);
-            t1 = evaluate_expr (a1, rec), t2 = evaluate_expr (a2, rec);
+            t1 = eval_expr (a1, rec), t2 = eval_expr (a2, rec);
             if (!is_datetime (t1) || !is_datetime (t2))
             {
                 return &error_expr;
@@ -640,7 +644,7 @@ inline ExprNode *evaluate_func (ExprNode *func, Record *rec)
     return &error_expr;
 }
 
-inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
+inline ExprNode *eval_expr (ExprNode *expr, Record *rec)
 {
     if (expr == NULL)
     {
@@ -671,7 +675,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         reflect_ari (EXPR_MUL);
         reflect_ari (EXPR_DIV);
     case EXPR_MOD:
-        l = evaluate_expr (expr->l, rec), r = evaluate_expr (expr->r, rec);
+        l = eval_expr (expr->l, rec), r = eval_expr (expr->r, rec);
         if (l->type == EXPR_INTNUM && r->type == EXPR_INTNUM)
         {
             res->type = EXPR_INTNUM;
@@ -687,8 +691,8 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     case EXPR_AND:
     case EXPR_OR:
     case EXPR_XOR:
-        return calc_logic (expr->type, evaluate_expr (expr->l, rec),
-                           evaluate_expr (expr->r, rec));
+        return calc_logic (expr->type, eval_expr (expr->l, rec),
+                           eval_expr (expr->r, rec));
         reflect_com (EXPR_EQ);
         reflect_com (EXPR_NE);
         reflect_com (EXPR_LT);
@@ -696,7 +700,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         reflect_com (EXPR_LE);
         reflect_com (EXPR_GE);
     case EXPR_NEG:
-        r = evaluate_expr (expr->r, rec);
+        r = eval_expr (expr->r, rec);
         if (r->type == EXPR_INTNUM)
         {
             res->type = EXPR_INTNUM;
@@ -710,7 +714,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
             return &error_expr;
         }
     case EXPR_NOT:
-        r = evaluate_expr (expr->r, rec);
+        r = eval_expr (expr->r, rec);
         if (r->type == EXPR_INTNUM)
         {
             res->type = EXPR_INTNUM;
@@ -737,7 +741,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         res->intval ^= flag;
         return res;
     case EXPR_FUNC:
-        return evaluate_func (expr, rec);
+        return eval_func (expr, rec);
     case EXPR_COUNT:
     case EXPR_COUNT_ALL:
     case EXPR_SUM:
@@ -753,7 +757,7 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
     case EXPR_CASE_ELSE:
     case EXPR_CASE_EXPR:
     case EXPR_CASE_EXPR_ELSE:
-        return evaluate_case (expr, rec);
+        return eval_case (expr, rec);
     default:
         write_message ("ERROR(%d): Unknown expression.", -UNKNOWN_EXPRESSION);
         return &error_expr;
@@ -766,7 +770,7 @@ inline int judge_cond (ExprNode *cond, Record *rec)
     {
         return 1;
     }
-    ExprNode *res = evaluate_expr (cond, rec);
+    ExprNode *res = eval_expr (cond, rec);
     if (res->type == EXPR_ERROR)
     {
         return ERROR;
@@ -780,6 +784,22 @@ inline int judge_cond (ExprNode *cond, Record *rec)
 inline void append_record_column (ExprNode *val, Record *rec)
 {
     memcpy (&rec->item[ (rec->cnt)++], val, sizeof (ExprNode));
+}
+
+inline ExprNode *eval_odrby_expr (ExprNode *expr, Record *rec)
+{
+    if (expr == NULL)
+    {
+        return &error_expr;
+    }
+    else if (expr->type == EXPR_STRING || expr->type == EXPR_NAME)
+    {
+        return & (rec->item[get_column_index (expr->strval)]);
+    }
+    else
+    {
+        return eval_expr (expr, rec);
+    }
 }
 
 /*
@@ -803,7 +823,7 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
     {
         while (column_head)
         {
-            ExprNode *res = evaluate_expr (column_head, rec);
+            ExprNode *res = eval_expr (column_head, rec);
             if (is_error (res))
             {
                 return ERROR;
@@ -818,7 +838,7 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
         {
             for (uint i = 0; i < vcol_cnt; ++i)
             {
-                ExprNode *res = evaluate_expr (vcol[i], rec);
+                ExprNode *res = eval_expr (vcol[i], rec);
                 if (is_error (res))
                 {
                     return ERROR;
@@ -830,7 +850,22 @@ inline int extract_record (ExprNode *column_head, Record *rec, Records *recs)
             }
             for (uint i = 0; i < gcol_cnt; ++i)
             {
-                ExprNode *res = evaluate_expr (gcol[i], rec);
+                ExprNode *res = eval_expr (gcol[i], rec);
+                if (is_error (res))
+                {
+                    return ERROR;
+                }
+                else
+                {
+                    append_record_column (res, target);
+                }
+            }
+        }
+        if (is_odrby)
+        {
+            for (uint i = 0; i < ocol_cnt; ++i)
+            {
+                ExprNode *res = eval_odrby_expr (transform_op_expr (ocol[i]), rec);
                 if (is_error (res))
                 {
                     return ERROR;
@@ -947,10 +982,39 @@ inline void build_grp_col (ExprNode *grp)
 {
     while (grp)
     {
-        gcol[gcol_cnt++] = grp;
-        //gcol[gcol_cnt++] = transform_op_expr (grp);
+        gcol[gcol_cnt] = grp;
+        gsc[gcol_cnt] = grp->sc;
         grp = grp->next;
+        ++gcol_cnt;
     }
+}
+
+inline int get_column_index (char *col)
+{
+    for (uint i = 0; i < col_cnt; ++i)
+        if (!stricmp (col, col_name[i]))
+        {
+            return i;
+        }
+    return ERROR;
+}
+
+inline int build_odr_col (ExprNode *odr)
+{
+    while (odr)
+    {
+        ocol[ocol_cnt] = odr;
+        osc[ocol_cnt] = odr->sc;
+        if ( (ocol_prop[ocol_cnt] = get_column_index (odr->strval)) == ERROR)
+        {
+            write_message ("Error(%d): Unknown orderby expression %s.",
+                           UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
+            return ERROR;
+        }
+        odr = odr->next;
+        ++ocol_cnt;
+    }
+    return 0;
 }
 
 inline int cmp_g (Record *rec1, Record *rec2)
@@ -964,13 +1028,37 @@ inline int cmp_g (Record *rec1, Record *rec2)
             if (is_true (MAKE_EXPR_LT (& (rec1->item[i + col_cnt + vcol_cnt]),
                                        & (rec2->item[i + col_cnt + vcol_cnt]),
                                        NULL)
-                        ) ^ sc[i])
+                        ) ^ gsc[i])
             {
-                return 1;
+                return -1;
             }
             else
             {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+inline int cmp_o (Record *rec1, Record *rec2)
+{
+    for (uint i = 0; i < ocol_cnt; ++i)
+    {
+        if (is_true (MAKE_EXPR_NE (& (rec1->item[ocol_prop[i]]),
+                                   & (rec2->item[ocol_prop[i]]),
+                                   NULL)))
+        {
+            if (is_true (MAKE_EXPR_LT (& (rec1->item[ocol_prop[i]]),
+                                       & (rec2->item[ocol_prop[i]]),
+                                       NULL)
+                        ) ^ osc[i])
+            {
                 return -1;
+            }
+            else
+            {
+                return 1;
             }
         }
     }
@@ -1023,8 +1111,8 @@ inline int merge_agr (Records *recs, ExprNode *col_head)
             for (uint i = 0; i < col_cnt; ++i)
                 if (col_prop[i])
                 {
-                    ExprNode *res = evaluate_expr (get_col_by_index (col_head, i),
-                                                   & (recs->recs[beg]));
+                    ExprNode *res = eval_expr (get_col_by_index (col_head, i),
+                                               & (recs->recs[beg]));
                     memcpy (& (recs->recs[beg].item[i]), res, sizeof (ExprNode));
                 }
             recs->recs[beg].next = end;
@@ -1044,8 +1132,8 @@ inline int merge_agr (Records *recs, ExprNode *col_head)
     for (uint i = 0; i < col_cnt; ++i)
         if (col_prop[i])
         {
-            ExprNode *res = evaluate_expr (get_col_by_index (col_head, i),
-                                           & (recs->recs[beg]));
+            ExprNode *res = eval_expr (get_col_by_index (col_head, i),
+                                       & (recs->recs[beg]));
             memcpy (& (recs->recs[beg].item[i]), res, sizeof (ExprNode));
         }
     recs->recs[beg].next = recs->cnt;
@@ -1057,8 +1145,12 @@ inline int merge_agr (Records *recs, ExprNode *col_head)
     返回值表示过程是否出错
 */
 inline int do_select (SelectNode *select, Record *rec, Records *recs,
-                      byte subq, byte grpby)
+                      byte subq, byte grpby, byte odrby)
 {
+    if (is_limit = (select->limit != NULL))
+    {
+        limit = * (select->limit);
+    }
     if (load_tables (select->table_head, rec) == ERROR)
     {
         return ERROR;
@@ -1072,6 +1164,13 @@ inline int do_select (SelectNode *select, Record *rec, Records *recs,
         build_agr_col (select->column_head);
         build_grp_col (select->group);
     }//将聚合函数单独找出来
+    if (odrby)
+    {
+        if (build_odr_col (select->order) == ERROR)
+        {
+            return ERROR;
+        }
+    }
     do
     {
         int res = judge_cond (select->where, rec);
@@ -1119,7 +1218,8 @@ inline int exec_single (char *sql)
         //     return STATUS_ERROR;
         // }
         byte res = do_select (root->select, &rec, &recs, 0,
-                              is_grpby = (root->select->group != NULL));
+                              is_grpby = (root->select->group != NULL),
+                              is_odrby = (root->select->order != NULL));
         if (res != ERROR && crims_status == STATUS_SHELL)
         {
             print_result (&recs);
@@ -1220,10 +1320,11 @@ inline void query_initialize()
         col_name[i][0] = '\0';
         col_leng[i] = 0;
     }
-    col_cnt = 0;
-    is_grpby = 0;
-    vcol_cnt = 0;
-    gcol_cnt = 0;
-    memset (sc, 0, sizeof (sc));
+    is_grpby = 0, is_odrby = 0, is_limit = 0;
+    limit.start = 0, limit.count = INT_MAX;
+    col_cnt = 0, vcol_cnt = 0, gcol_cnt = 0;
+    memset (gsc, 0, sizeof (gsc));
+    memset (osc, 0, sizeof (osc));
+    memset (ocol_prop, 0, sizeof (ocol_prop));
     query_status = QUERY_BEGIN;
 }

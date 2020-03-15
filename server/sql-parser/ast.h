@@ -75,10 +75,10 @@ typedef struct ExprNode
         char *strval;
         struct SelectNode *select;
         struct ExprNode *case_head;
-        byte sc;
     };
     char *table, *alias;
     u16 op;
+    byte sc;
     char text[EXPR_LENGTH];
     struct ExprNode *l, *r;
     struct ExprNode *next;

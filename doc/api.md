@@ -403,6 +403,18 @@ SELECT CAR_INFO.plate,
 ```sql
 SELECT CAR_INFO.plate,
 	   CAR_INFO.cname,
+	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "rdays",
+       SUM(RENT_ORDER.actual_fee) AS "营业额", 
+       SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/TIMESTAMPDIFF(DAY, '2019-1-1', '2019-5-20') AS "租用率"
+       FROM CAR_INFO, RENT_ORDER
+       WHERE CAR_INFO.cid=RENT_ORDER.cid
+       AND RENT_ORDER.pickup_time > '2019-1-1' 
+       GROUP BY CAR_INFO.plate
+       ORDER BY "rdays" desc
+       LIMIT 10;
+       
+SELECT CAR_INFO.plate,
+	   CAR_INFO.cname,
 	   SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
            THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END) AS "累计出租天数",
        SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
@@ -422,6 +434,16 @@ SELECT CAR_INFO.plate,
 SELECT RENT_ORDER.pname,
 	   RENT_ORDER.identity_number,
        RENT_ORDER.phone_number,
+       SUM(RENT_ORDER.actual_fee) AS "money"
+       FROM RENT_ORDER
+       WHERE RENT_ORDER.pickup_time > '2019-1-1'
+       GROUP BY RENT_ORDER.identity_number
+       ORDER BY money desc 
+       LIMIT 10;
+       
+SELECT RENT_ORDER.pname,
+	   RENT_ORDER.identity_number,
+       RENT_ORDER.phone_number,
        SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
            THEN RENT_ORDER.actual_fee END) AS "消费金额"
        FROM RENT_ORDER
@@ -429,4 +451,3 @@ SELECT RENT_ORDER.pname,
        ORDER BY "消费金额" desc 
        LIMIT 10;
 ```
-

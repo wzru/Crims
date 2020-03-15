@@ -44,13 +44,16 @@ enum
 #define RECS_INITIAL_LENGTH 128
 extern Record rec;
 extern Records recs;
-extern uint col_cnt, vcol_cnt, gcol_cnt;
+extern uint col_cnt, vcol_cnt, gcol_cnt, ocol_cnt;
 extern char col_name[RECORD_COLUMNS][EXPR_LENGTH];
 extern byte col_leng[RECORD_COLUMNS];
-extern byte is_grpby;
-extern ExprNode *vcol[RECORD_COLUMNS], *gcol[RECORD_COLUMNS];
-extern byte sc[RECORD_COLUMNS];
-extern u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS];
+extern byte is_grpby, is_odrby, is_limit;
+extern LimitNode limit;
+extern ExprNode *vcol[RECORD_COLUMNS], *gcol[RECORD_COLUMNS],
+       *ocol[RECORD_COLUMNS];
+extern byte gsc[RECORD_COLUMNS], osc[RECORD_COLUMNS];
+extern u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS],
+       ocol_prop[RECORD_COLUMNS];
 extern byte query_status;
 
 extern clock_t op_start, op_end;
@@ -58,6 +61,7 @@ extern clock_t op_start, op_end;
 inline int exec (char *command);
 inline int write_message (char *s, ...);
 
+inline int cmp_o (Record *rec1, Record *rec2);
 inline void load_item (Record *rec, int beg);
 inline void clear_record (Record *rec);
 inline void clear_records (Records *recs);
@@ -67,8 +71,8 @@ inline int get_next_record (Record *rec);
 inline int extract_record (ExprNode *column_head, Record *rec, Records *recs);
 inline void add_record (Record *rec, Records *recs);
 inline void query_initialize();
-inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec);
+inline ExprNode *eval_expr (ExprNode *expr, Record *rec);
 inline int do_select (SelectNode *select, Record *rec, Records *recs,
-                      byte subq, byte grpby);
+                      byte subq, byte grpby, byte odrby);
 
 #endif
