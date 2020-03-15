@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-#include "define.h"
 #include "help.h"
 
 char main_help[MAIN_HELP_LENGTH] = "I'm HELP!";

@@ -4,7 +4,6 @@
 #include "database.h"
 #include "define.h"
 #include "shell.h"
-#include "debug.h"
 #include "start.h"
 #include "help.h"
 #include "exec.h"

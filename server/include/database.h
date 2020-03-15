@@ -72,6 +72,4 @@ inline void insert_car_type (CarType *ct);
 inline void insert_car_info (CarInfo *ci);
 inline void insert_rent_order (RentOrder *ro);
 
-inline void print_result (Records *recs);
-
 #endif
