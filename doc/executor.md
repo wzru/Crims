@@ -74,29 +74,36 @@
   	FROM CAR_TYPE, CAR_INFO
       WHERE CAR_TYPE.code=CAR_INFO.code
       GROUP BY CAR_TYPE.tname;
-- [ ] SELECT CAR_TYPE.tname, SUM(RENT_ORDER.actual_fee)
+- [x] SELECT CAR_TYPE.tname, SUM(RENT_ORDER.actual_fee)
       FROM CAR_TYPE, RENT_ORDER
       WHERE CAR_TYPE.code IN (SELECT CAR_INFO.code 
                              FROM CAR_INFO 
                              WHERE cid=RENT_ORDER.cid) 
-      AND RENT_ORDER.pickup_time > '2019/2/1' 
-      AND RENT_ORDER.pickup_time < '2019/2/28'
+      AND RENT_ORDER.pickup_time > '2019-2-1' 
+      AND RENT_ORDER.pickup_time < '2019-2-28'
       GROUP BY CAR_TYPE.tname;
-- [ ] SELECT CAR_INFO.plate, 
+- [x] SELECT CAR_INFO.plate, 
   	   CAR_INFO.cname, 
   	   SUM(RENT_ORDER.actual_fee) AS "营业额", 
-         SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365 AS "租用率"
+         SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "租用天数"
+         FROM CAR_INFO, RENT_ORDER
+         WHERE CAR_INFO.cid=RENT_ORDER.cid
+         GROUP BY CAR_INFO.plate;
+- [x] SELECT CAR_INFO.plate, 
+  	   CAR_INFO.cname, 
+  	   SUM(RENT_ORDER.actual_fee) AS "营业额", 
+         SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365*100 AS "租用率"
          FROM CAR_INFO, RENT_ORDER
          WHERE CAR_INFO.cid=RENT_ORDER.cid
          GROUP BY CAR_INFO.plate;
 - [ ] SELECT CAR_INFO.plate,
   	   CAR_INFO.cname,
-  	   SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
+  	   SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
              THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END) AS "累计出租天数",
-         SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
+         SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
              THEN RENT_ORDER.actual_fee END) AS "营业额", 
-         SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
-             THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END)/TIMESTAMPDIFF(DAY, '2019/1/1', '2019/5/20') AS "租用率"
+         SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
+             THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END)/TIMESTAMPDIFF(DAY, '2019-1-1', '2019-5-20') AS "租用率"
          FROM CAR_INFO, RENT_ORDER
          WHERE CAR_INFO.cid=RENT_ORDER.cid
          GROUP BY CAR_INFO.plate
@@ -105,7 +112,7 @@
 - [ ] SELECT RENT_ORDER.pname,
   	   RENT_ORDER.identity_number,
          RENT_ORDER.phone_number,
-         SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
+         SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
              THEN RENT_ORDER.actual_fee END) AS "消费金额"
          FROM RENT_ORDER
          GROUP BY RENT_ORDER.identity_number

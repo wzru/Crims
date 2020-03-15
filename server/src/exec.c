@@ -359,6 +359,7 @@ inline time_t make_datetime (char *s)
 #define DEFINE_BINARY_ARI_OP(name, op) inline ExprNode* MAKE_##name(ExprNode *l, ExprNode *r, Record *rec) {\
         if (l == NULL || r == NULL) return &error_expr; \
         ExprNode *lhs = evaluate_expr (l, rec), *rhs = evaluate_expr (r, rec), *res = calloc(1,sizeof(ExprNode));\
+        if(is_lazy(lhs) || is_lazy(rhs)) return &lazy_expr;\
         if (can_asmd (lhs) && can_asmd (rhs)){ \
             if (max (lhs->type, rhs->type) == EXPR_APPROXNUM){res->type = EXPR_APPROXNUM; res->floatval = get_number (lhs) op get_number (rhs);}\
             else{ res->type = EXPR_INTNUM;res->intval = lhs->intval op rhs->intval;}}\
@@ -367,6 +368,7 @@ inline time_t make_datetime (char *s)
 #define DEFINE_BINARY_COM_OP(name, op) inline ExprNode* MAKE_##name(ExprNode *l, ExprNode *r, Record *rec) {\
         if(l==NULL || r==NULL) return &error_expr;\
         ExprNode *lhs = evaluate_expr(l, rec), *rhs = evaluate_expr(r, rec), *res = calloc(1, sizeof(ExprNode));\
+        if(is_lazy(lhs) || is_lazy(rhs)) return &lazy_expr;\
         if(can_comp(lhs, rhs)) { res->type=EXPR_INTNUM;\
             if(max(lhs->type, rhs->type)<=EXPR_APPROXNUM) {  res->intval = get_number(lhs) op get_number(rhs);}\
             else if(lhs->type==EXPR_STRING && rhs->type==EXPR_STRING){ res->intval = strcmp(lhs->strval, rhs->strval) op 0; }\
@@ -536,6 +538,39 @@ inline int is_lazy (ExprNode *expr)
     return expr && expr->type == EXPR_LAZY;
 }
 
+inline int is_datetime (ExprNode *expr)
+{
+    return expr && (expr->type == EXPR_STRING || expr->type == EXPR_DATETIME);
+}
+
+inline ExprNode *transform_op_expr (ExprNode *grp)
+{
+    if (grp == NULL)
+    {
+        return NULL;
+    }
+    ExprNode *expr = calloc (1, sizeof (ExprNode));
+    memcpy (expr, grp, sizeof (ExprNode));
+    expr->type = expr->op;
+    return expr;
+}
+
+inline ExprNode *make_int_expr (int x)
+{
+    ExprNode *expr = calloc (1, sizeof (ExprNode));
+    expr->type = EXPR_INTNUM;
+    expr->intval = x;
+    return expr;
+}
+
+inline ExprNode *make_float_expr (float f)
+{
+    ExprNode *expr = calloc (1, sizeof (ExprNode));
+    expr->type = EXPR_APPROXNUM;
+    expr->floatval = f;
+    return expr;
+}
+
 inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
 {
     ExprNode *case_head = case_node->case_head,
@@ -565,6 +600,44 @@ inline ExprNode *evaluate_case (ExprNode *case_node, Record *rec)
         }
         case_head = case_head->next;
     }
+}
+
+inline ExprNode *evaluate_func (ExprNode *func, Record *rec)
+{
+    ExprNode *a0, *a1, *a2, *t1, *t2;
+    if (!stricmp (func->strval, "TIMESTAMPDIFF"))
+    {
+        a0 = func->r;
+        if (a0 && a0->next && a0->next->next)
+        {
+            a1 = transform_op_expr (a0->next), a2 = transform_op_expr (a1->next);
+            t1 = evaluate_expr (a1, rec), t2 = evaluate_expr (a2, rec);
+            if (!is_datetime (t1) || !is_datetime (t2))
+            {
+                return &error_expr;
+            }
+            float diff =  make_datetime (t2->strval) - make_datetime (t1->strval);
+            if (!stricmp (a0->strval, "DAY"))
+            {
+                return make_float_expr (diff / 3600 / 24);
+            }
+            else if (!stricmp (a0->strval, "HOUR"))
+            {
+                return make_float_expr (diff / 3600);
+            }
+            else if (!stricmp (a0->strval, "MINUTE"))
+            {
+                return make_float_expr (diff / 60);
+            }
+            else if (!stricmp (a0->strval, "SECOND"))
+            {
+                return make_float_expr (diff);
+            }
+        }
+    }
+    write_message ("Error(%d): Invalid function statement %s.",
+                   INVALID_FUNCTION_STATEMENT, func->text);
+    return &error_expr;
 }
 
 inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
@@ -663,6 +736,8 @@ inline ExprNode *evaluate_expr (ExprNode *expr, Record *rec)
         res = is_in_select (expr->l, expr->select, rec);
         res->intval ^= flag;
         return res;
+    case EXPR_FUNC:
+        return evaluate_func (expr, rec);
     case EXPR_COUNT:
     case EXPR_COUNT_ALL:
     case EXPR_SUM:
@@ -868,18 +943,6 @@ inline void build_agr_col (ExprNode *col)
     }
 }
 
-inline ExprNode *transform_op_expr (ExprNode *grp)
-{
-    if (grp == NULL)
-    {
-        return NULL;
-    }
-    ExprNode *expr = calloc (1, sizeof (ExprNode));
-    memcpy (expr, grp, sizeof (ExprNode));
-    expr->type = expr->op;
-    return expr;
-}
-
 inline void build_grp_col (ExprNode *grp)
 {
     while (grp)
@@ -912,14 +975,6 @@ inline int cmp_g (Record *rec1, Record *rec2)
         }
     }
     return 0;
-}
-
-inline ExprNode *make_int_expr (int x)
-{
-    ExprNode *expr = calloc (1, sizeof (ExprNode));
-    expr->type = EXPR_INTNUM;
-    expr->intval = x;
-    return expr;
 }
 
 inline void merge_item_left (ExprNode *lhs, ExprNode *rhs, u16 type,

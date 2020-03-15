@@ -239,10 +239,10 @@ INSERT INTO RENT_ORDER VAULES
      '王二麻子',
      13412345678,
      16,
-     '2019/02/17-13:00',
-     '2019/02/16-13:00',
+     '2019-02-17/13:00',
+     '2019-02-16/13:00',
      1105.0,
-     '2019/02/17-13:00',
+     '2019-02-17/13:00',
      221.0,
      442.0
     );
@@ -356,8 +356,8 @@ SELECT *
 ```sql
 SELECT *
 	FROM RENT_ORDER
-	WHERE pickup_time >= '2019/02/11'
-	AND pickup_time <= '2019/05/12';
+	WHERE pickup_time >= '2019-02-11'
+	AND pickup_time <= '2019-05-12';
 ```
 
 ### 数据统计
@@ -381,8 +381,8 @@ SELECT CAR_TYPE.tname, SUM(RENT_ORDER.actual_fee)
     FROM CAR_TYPE, CAR_INFO, RENT_ORDER
     WHERE CAR_TYPE.code = CAR_INFO.code
     AND CAR_INFO.cid = RENT_ORDER.cid
-    AND RENT_ORDER.pickup_time > '2019/2/1' 
-    AND RENT_ORDER.pickup_time < '2019/2/28'
+    AND RENT_ORDER.pickup_time > '2019-2-1' 
+    AND RENT_ORDER.pickup_time < '2019-2-28'
     GROUP BY CAR_TYPE.tname;
 ```
 
@@ -403,12 +403,12 @@ SELECT CAR_INFO.plate,
 ```sql
 SELECT CAR_INFO.plate,
 	   CAR_INFO.cname,
-	   SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
+	   SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
            THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END) AS "累计出租天数",
-       SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
+       SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
            THEN RENT_ORDER.actual_fee END) AS "营业额", 
-       SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
-           THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END)/TIMESTAMPDIFF(DAY, '2019/1/1', '2019/5/20') AS "租用率"
+       SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
+           THEN TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time) END)/TIMESTAMPDIFF(DAY, '2019-1-1', '2019-5-20') AS "租用率"
        FROM CAR_INFO, RENT_ORDER
        WHERE CAR_INFO.cid=RENT_ORDER.cid
        GROUP BY CAR_INFO.plate
@@ -422,7 +422,7 @@ SELECT CAR_INFO.plate,
 SELECT RENT_ORDER.pname,
 	   RENT_ORDER.identity_number,
        RENT_ORDER.phone_number,
-       SUM(CASE WHEN RENT_ORDER.pickup_time > '2019/1/1' 
+       SUM(CASE WHEN RENT_ORDER.pickup_time > '2019-1-1' 
            THEN RENT_ORDER.actual_fee END) AS "消费金额"
        FROM RENT_ORDER
        GROUP BY RENT_ORDER.identity_number

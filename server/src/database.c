@@ -441,6 +441,7 @@ char format[JSON_BUFFER_LENGTH];
 inline void print_result (Records *recs)
 {
     op_end = clock();
+    uint row_cnt = 0;
     memset (format, 0, sizeof (format));
     if (recs == NULL || recs->cnt == 0)
     {
@@ -481,9 +482,10 @@ inline void print_result (Records *recs)
                 printf (" ");
             }
             puts ("|");
+            ++row_cnt;
         }
         print_interval_line();
-        printf ("%d %s in set (%.2f sec)\n", recs->cnt, recs->cnt > 1 ? "rows" : "row",
+        printf ("%d %s in set (%.2f sec)\n", row_cnt, row_cnt > 1 ? "rows" : "row",
                 (op_end - op_start) / CLK_TCK);
     }
 }
