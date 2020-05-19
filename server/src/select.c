@@ -5,6 +5,7 @@
 #include "strptime.h"
 #include "select.h"
 #include "server.h"
+#include "regex.h"
 #include "debug.h"
 #include "exec.h"
 
@@ -665,6 +666,24 @@ inline ExprNode *eval_not_expr (ExprNode *r, Record *rec)
     }
 }
 
+inline ExprNode *eval_like_expr (ExprNode *l, ExprNode *r, Record *rec)
+{
+    ExprNode *res = calloc (sizeof (ExprNode), 1);
+    l = eval_expr (l, rec), r = eval_expr (r, rec);
+    if (l->type == EXPR_STRING && r->type == EXPR_STRING)
+    {
+        res->type = EXPR_INTNUM;
+        res->intval = match (r->strval, l->strval);
+        return res;
+    }
+    else
+    {
+        write_message ("ERROR(%d): There is no matching operator `LIKE`.",
+                       -NO_MATCHING_OPERATOR);
+        return &error_expr;
+    }
+}
+
 /*
     核心函数, 根据record记录来求表达式值
 */
@@ -731,7 +750,12 @@ inline ExprNode *eval_expr (ExprNode *expr, Record *rec)
         res = is_in_val_list (expr->l, expr->r, rec);
         res->intval ^= flag;
         return res;
-    //TODO:LIKE
+    case EXPR_NOT_LIKE:
+        flag = 1;
+    case EXPR_LIKE:
+        res = eval_like_expr (expr->l, expr->r, rec);
+        res->intval ^= flag;
+        return res;
     case EXPR_NOT_IN_SELECT:
         flag = 1;
     case EXPR_IN_SELECT:
