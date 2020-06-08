@@ -19,19 +19,6 @@ ExprNode error_expr = {.type = EXPR_ERROR},
 byte query_status;
 clock_t op_start, op_end;
 
-inline int write_message (char *s, ...)
-{
-    va_list ap;
-    va_start (ap, s);
-    switch (crims_status)
-    {
-    case STATUS_SHELL:
-        vfprintf (stderr, s, ap);
-        fprintf (stderr, "\n");
-        break;
-    }
-}
-
 /*
     执行单句SQL
 */

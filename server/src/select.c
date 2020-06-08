@@ -8,6 +8,7 @@
 #include "regex.h"
 #include "debug.h"
 #include "exec.h"
+#include "log.h"
 
 Record rec;
 Records recs;
@@ -53,10 +54,10 @@ inline int append_record_table (TableNode *table, Record *rec)
         }
     else
     {
-        write_message ("ERROR(%d): Unknown table type.", -UNKNOWN_TABLE);
+        log ("[ERROR](%d): Unknown table type.", -UNKNOWN_TABLE);
         return ERROR;
     }
-    write_message ("ERROR(%d): Table NOT exists.", -TABLE_NOT_EXIST);
+    log ("[ERROR](%d): Table NOT exists.", -TABLE_NOT_EXIST);
     return ERROR;
 }
 
@@ -249,12 +250,12 @@ inline int get_index_by_name (char *name, Record *rec)
     }
     if (!cnt)
     {
-        write_message ("ERROR(%d): Unknown column '%s'.", -UNKNOWN_TABLE, name);
+        log ("[ERROR](%d): Unknown column '%s'.", -UNKNOWN_TABLE, name);
         return UNKNOWN_COLUMN;
     }
     else if (cnt > 1)
     {
-        write_message ("ERROR(%d): Ambiguous column '%s'.", -AMBIGUOUS_COLUMN, name);
+        log ("[ERROR](%d): Ambiguous column '%s'.", -AMBIGUOUS_COLUMN, name);
         return AMBIGUOUS_COLUMN;
     }
     else
@@ -277,13 +278,13 @@ inline int get_index_by_table_column (char *table, char *column, Record *rec)
     }
     if (!cnt)
     {
-        write_message ("ERROR(%d): Unknown column '%s.%s'.", -UNKNOWN_TABLE, table,
+        log ("[ERROR](%d): Unknown column '%s.%s'.", -UNKNOWN_TABLE, table,
                        column);
         return UNKNOWN_COLUMN;
     }
     else if (cnt > 1)
     {
-        write_message ("ERROR(%d): Ambiguous column '%s.%s'.", -AMBIGUOUS_COLUMN, table,
+        log ("[ERROR](%d): Ambiguous column '%s.%s'.", -AMBIGUOUS_COLUMN, table,
                        column);
         return AMBIGUOUS_COLUMN;
     }
@@ -466,7 +467,7 @@ inline ExprNode *is_in_select (ExprNode *expr, SelectNode *select, Record *rec)
     }
     else if (subrecs->recs[0].cnt != 1) //如果有多列
     {
-        write_message ("Operand should contain 1 column");
+        log ("Operand should contain 1 column");
         return &error_expr;
     }
     else
@@ -607,7 +608,7 @@ inline ExprNode *eval_func (ExprNode *func, Record *rec)
             }
         }
     }
-    write_message ("Error(%d): Invalid function statement %s.",
+    log ("[ERROR](%d): Invalid function statement %s.",
                    INVALID_FUNCTION_STATEMENT, func->text);
     return &error_expr;
 }
@@ -624,7 +625,7 @@ inline ExprNode *eval_mod_expr (ExprNode *l, ExprNode *r, Record *rec)
     }
     else
     {
-        write_message ("ERROR(%d): There is no matching operator \%.",
+        log ("[ERROR](%d): There is no matching operator \%.",
                        -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -642,7 +643,7 @@ inline ExprNode *eval_neg_expr (ExprNode *r, Record *rec)
     }
     else
     {
-        write_message ("ERROR(%d): There is no matching operator -.",
+        log ("[ERROR](%d): There is no matching operator -.",
                        -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -660,7 +661,7 @@ inline ExprNode *eval_not_expr (ExprNode *r, Record *rec)
     }
     else
     {
-        write_message ("ERROR(%d): There is no matching operator ~.",
+        log ("[ERROR](%d): There is no matching operator ~.",
                        -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -678,7 +679,7 @@ inline ExprNode *eval_like_expr (ExprNode *l, ExprNode *r, Record *rec)
     }
     else
     {
-        write_message ("ERROR(%d): There is no matching operator `LIKE`.",
+        log ("[ERROR](%d): There is no matching operator `LIKE`.",
                        -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -781,7 +782,7 @@ inline ExprNode *eval_expr (ExprNode *expr, Record *rec)
     case EXPR_CASE_EXPR_ELSE:
         return eval_case (expr, rec);
     default:
-        write_message ("ERROR(%d): Unknown expression.", -UNKNOWN_EXPRESSION);
+        log ("[ERROR](%d): Unknown expression.", -UNKNOWN_EXPRESSION);
         return &error_expr;
     }
 }
@@ -926,7 +927,7 @@ inline int calc_col_cnt (TableNode *table_head)
         int tmp = get_index_by_table_name (table_head->table);
         if (tmp == -1)
         {
-            write_message ("ERROR(%d): Unknown table name '%s'.", UNKNOWN_TABLE,
+            log ("[ERROR](%d): Unknown table name '%s'.", UNKNOWN_TABLE,
                            table_head->table);
             return 0;
         }
@@ -960,7 +961,7 @@ inline void load_column_names (ExprNode *col, TableNode *tbl)
         {
             if (!strlen (col->text))
             {
-                write_message ("No column name can be used.");
+                log ("No column name can be used.");
             }
             if (col->alias && strlen (col->alias))
             {
@@ -1029,7 +1030,7 @@ inline int build_odr_col (ExprNode *odr)
         osc[ocol_cnt] = odr->sc;
         if ( (ocol_prop[ocol_cnt] = get_column_index (odr->strval)) == ERROR)
         {
-            write_message ("Error(%d): Unknown orderby expression %s.",
+            log ("[ERROR](%d): Unknown orderby expression %s.",
                            UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
             return ERROR;
         }

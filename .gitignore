@@ -2,19 +2,20 @@
 *.obj
 *.exe
 *.output
+*.log
 
 lexer.c
 *.tab.c
 *.tab.h
 
-**/.vscode/**
-**/.vs/**
-**/.idea/**
+.vscode
+.vs
+.idea
 
-**/build/**
-**/bin/**
-**/dll/**
-**/obj/**
+build
+bin
+dll
+obj
 
-**/cmake-build-*/**
-**/node_modules/**
+cmake-build-*
+node_modules

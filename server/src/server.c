@@ -8,7 +8,7 @@
 
 //#pragma comment(lib,"ws2_32.lib")
 
-int listen_port = DEFAULT_LISTEN_PORT;
+u16 listen_port = DEFAULT_LISTEN_PORT;
 int address_length = sizeof (struct sockaddr_in);
 char send_buffer[BUFFER_LENGTH];
 

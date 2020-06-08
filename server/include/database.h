@@ -6,9 +6,8 @@
 #include "define.h"
 #include "exec.h"
 
-#define DATABASE_PATH_LENGTH 256
 #define DEFAULT_DATABASE_PATH "../data/.db"
-extern char database_path[DATABASE_PATH_LENGTH];
+extern char database_path[PATH_LENGTH];
 
 extern CarTypeNode *head;
 extern CarTypeNode *ct_ptr;

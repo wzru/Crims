@@ -1,0 +1,12 @@
+#ifndef LOG_H
+#define LOG_H
+
+#include "define.h"
+
+// extern FILE *log_stream = NULL;
+// extern char log_path[PATH_LENGTH];
+
+inline void log (const char *fmt, ...);
+inline void initialize_log();
+
+#endif

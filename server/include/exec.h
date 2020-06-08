@@ -19,6 +19,5 @@ extern clock_t op_start, op_end;
 extern byte query_status;
 
 inline int exec (char *command);
-inline int write_message (char *s, ...);
 
 #endif

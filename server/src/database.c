@@ -8,7 +8,7 @@
 #include "json.h"
 #include "ast.h"
 
-char database_path[DATABASE_PATH_LENGTH] = DEFAULT_DATABASE_PATH;
+char database_path[PATH_LENGTH] = DEFAULT_DATABASE_PATH;
 
 CarTypeNode *head = NULL;
 CarTypeNode *ct_ptr = NULL;

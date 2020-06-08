@@ -13,6 +13,7 @@ enum ErrorCode
     TABLE_NOT_EXIST,
     INVALID_FUNCTION_STATEMENT,
     UNKNOWN_ORDERBY_EXPRESSION,
+    CANNOT_OPEN_LOG,
     ERROR = -1,
 };
 
@@ -25,5 +26,7 @@ inline void output_car_info (CarInfo *ci);
 inline void output_rent_order (RentOrder *ro);
 
 inline int test_read_write();
+
+inline void print_args (int argc, char *argv[]);
 
 #endif

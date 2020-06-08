@@ -3,6 +3,7 @@
 #include "database.h"
 #include "analyze.h"
 #include "ast.h"
+#include "log.h"
 
 TableColumnArray table_column_array;
 
@@ -25,7 +26,7 @@ inline int check_table (char *table, TableColumnArray *p)
             }
             return 0;
         }
-    write_message ("ERROR: Unknown table reference '%s'", table);
+    log ("[ERROR]: Unknown table reference '%s'", table);
     return 1;
 }
 
@@ -39,7 +40,7 @@ inline int check_table_column (char *table, char *column, TableColumnArray *p)
                 return 0;
             }
         }
-    write_message ("ERROR: Unknown column reference '%s.%s'", table, column);
+    log ("[ERROR]: Unknown column reference '%s.%s'", table, column);
     return 1;
 }
 

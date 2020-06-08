@@ -27,9 +27,14 @@ int main (int argc, char *argv[])
         //return test_read_write();
         break;
     default:
-        if (!strcmp (argv[1], "help"))
+        if (!strcmp (argv[1], "--help"))
         {
             return help (argc, argv); //帮助信息
+        }
+        else if (!strcmp (argv[1], "--version"))
+        {
+            printf("crims_server version %d.%d.%d, compiled at %s, %s\n", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION,  __TIME__,__DATE__);
+            return 0;
         }
         else if (!strcmp (argv[1], "start"))
         {

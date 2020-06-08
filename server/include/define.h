@@ -1,6 +1,10 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
+#define MAJOR_VERSION 0
+#define MINOR_VERSION 1
+#define PATCH_VERSION 0
+
 //基本数据结构定义
 #define CAR_TYPE_TNAME_LENGTH 20
 struct CarType//车辆分类信息结构体
@@ -72,7 +76,7 @@ struct CarTypeNode
 };
 typedef struct CarTypeNode CarTypeNode;
 
-typedef unsigned char byte;
+typedef unsigned char byte, u8;
 typedef unsigned int uint, u32;
 typedef unsigned short u16;
 typedef unsigned long long ull, datetime, int64, i64;
@@ -87,6 +91,8 @@ enum//用来区分当前运行状态
     STATUS_UNKNOWN
 };
 extern byte crims_status;
+
+#define PATH_LENGTH 256
 
 #define TABLE_COLUMN_COUNT 20
 #define COLUMN_NAME_LENGTH 23

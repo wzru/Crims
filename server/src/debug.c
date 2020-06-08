@@ -72,3 +72,11 @@ inline int test_read_write() //用来测试读写是否正常
     recursive_print (head->next, NULL, NULL, TYPE_CAR, stdout);
     write (database_path);
 }
+
+inline void print_args (int argc, char *argv[])
+{
+    for (int i = 0; i < argc; ++i)
+    {
+        printf ("%d : %s\n", i, argv[i]);
+    }
+}
