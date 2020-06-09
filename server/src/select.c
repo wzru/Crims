@@ -279,13 +279,13 @@ inline int get_index_by_table_column (char *table, char *column, Record *rec)
     if (!cnt)
     {
         log ("[ERROR](%d): Unknown column '%s.%s'.", -UNKNOWN_TABLE, table,
-                       column);
+             column);
         return UNKNOWN_COLUMN;
     }
     else if (cnt > 1)
     {
         log ("[ERROR](%d): Ambiguous column '%s.%s'.", -AMBIGUOUS_COLUMN, table,
-                       column);
+             column);
         return AMBIGUOUS_COLUMN;
     }
     else
@@ -609,7 +609,7 @@ inline ExprNode *eval_func (ExprNode *func, Record *rec)
         }
     }
     log ("[ERROR](%d): Invalid function statement %s.",
-                   INVALID_FUNCTION_STATEMENT, func->text);
+         INVALID_FUNCTION_STATEMENT, func->text);
     return &error_expr;
 }
 
@@ -626,7 +626,7 @@ inline ExprNode *eval_mod_expr (ExprNode *l, ExprNode *r, Record *rec)
     else
     {
         log ("[ERROR](%d): There is no matching operator \%.",
-                       -NO_MATCHING_OPERATOR);
+             -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -644,7 +644,7 @@ inline ExprNode *eval_neg_expr (ExprNode *r, Record *rec)
     else
     {
         log ("[ERROR](%d): There is no matching operator -.",
-                       -NO_MATCHING_OPERATOR);
+             -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -662,7 +662,7 @@ inline ExprNode *eval_not_expr (ExprNode *r, Record *rec)
     else
     {
         log ("[ERROR](%d): There is no matching operator ~.",
-                       -NO_MATCHING_OPERATOR);
+             -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -680,7 +680,7 @@ inline ExprNode *eval_like_expr (ExprNode *l, ExprNode *r, Record *rec)
     else
     {
         log ("[ERROR](%d): There is no matching operator `LIKE`.",
-                       -NO_MATCHING_OPERATOR);
+             -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -928,7 +928,7 @@ inline int calc_col_cnt (TableNode *table_head)
         if (tmp == -1)
         {
             log ("[ERROR](%d): Unknown table name '%s'.", UNKNOWN_TABLE,
-                           table_head->table);
+                 table_head->table);
             return 0;
         }
         else
@@ -1031,7 +1031,7 @@ inline int build_odr_col (ExprNode *odr)
         if ( (ocol_prop[ocol_cnt] = get_column_index (odr->strval)) == ERROR)
         {
             log ("[ERROR](%d): Unknown orderby expression %s.",
-                           UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
+                 UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
             return ERROR;
         }
         odr = odr->next;
@@ -1387,7 +1387,6 @@ inline void print_interval_line()
 }
 
 #define next(i) (is_grpby?recs->recs[i].next:((i)+1))
-
 char format[BUFFER_LENGTH];
 Records result;
 inline void print_result (Records *recs)
@@ -1412,13 +1411,6 @@ inline void print_result (Records *recs)
             }
             suml += col_leng[j];
         }
-        // #ifdef DEBUG
-        // for (uint j = 0; j < col_cnt; ++j)
-        // {
-        //     printf ("%d ", col_leng[j]);
-        // }
-        // putchar ('\n');
-        // #endif
         print_interval_line();
         for (uint j = 0; j < col_cnt; ++j)
         {
@@ -1451,3 +1443,4 @@ inline void print_result (Records *recs)
                 (op_end - op_start) / CLK_TCK);
     }
 }
+#undef next

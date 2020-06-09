@@ -5,6 +5,7 @@
 
 #include "server.h"
 #include "exec.h"
+#include "json.h"
 #include "log.h"
 
 //#pragma comment(lib,"ws2_32.lib")
@@ -83,7 +84,11 @@ inline int run_server()
                     {
                         log ("[INFO]: Received client message: %s\n", recv_buffer);
                         exec (recv_buffer);
-                        send (client_sockets.fd_array[i], recv_buffer, strlen (recv_buffer), 0);
+                        #ifdef DEBUG
+                        printf ("%s\n", json_buffer);
+                        #endif
+                        send (client_sockets.fd_array[i], json_buffer, strlen (json_buffer), 0);
+                        //send (client_sockets.fd_array[i], recv_buffer, strlen (recv_buffer), 0);
                     }
                     else
                     {

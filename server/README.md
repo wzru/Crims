@@ -1,15 +1,14 @@
 # Crims Server
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims/tree/master/server) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/tree/master/server) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/tree/master/server) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims/tree/master/server)
-
 ## Usage
 
-This project uses cmake. Go check them out if you don't have them locally installed. 
+This project uses cmake and make. Go check them out if you don't have them locally installed. 
 
 ```shell
-./crims_server help # get help
-./crims_server start # start server
-./crims_server # shell
+./crims_server start -p 8000 # start server on port 8000
+./crims_server --help # get help
+./crims_server --version # get version
+./crims_server # interactive shell
 ./crims_server exec "some commands;" # execute some commands
 ```
 
@@ -21,12 +20,11 @@ This project uses cmake. Go check them out if you don't have them locally instal
 - [x] Multithreading
 - [x] SQL Parser
 - [x] SQL Executor
-- [ ] Data Operation
-- [ ] XLS Support
+- [x] JSON
 - [ ] Help Document
 - [ ] Test
 
-## Maintainers
+## Developer
 
 [ShaunWang](https://github.com/WangZhengru)
 

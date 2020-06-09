@@ -8,6 +8,7 @@
 #include "select.h"
 #include "shell.h"
 #include "debug.h"
+#include "json.h"
 #include "ast.h"
 
 char single_command[COMMAND_BUFFER_LENGTH];
@@ -46,7 +47,8 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                //TODO
+                jsonify_result (&recs);
+                break;
             case STATUS_SHELL:
             case STATUS_EXEC:
                 print_result (&recs);
