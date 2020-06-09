@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "log.h"
 #include "debug.h"
@@ -23,13 +24,17 @@ inline int start (int argc, char *argv[])
             break;//可能对带空格的路径支持有问题, 需要加引号
         }
     }
-    initialize_log();
     log ("[INFO]: Reading data from '%s'...\n", database_path);
-    if (read (database_path))
-    {
-        log ("[ERROR]: Cannot read data file\n");
-        return -1;
-    }
+    //多线程处理, IO不等待
+    pthread_t read_db_thread;
+    pthread_create (&read_db_thread, NULL, read, database_path);
+    initialize_log();
+    pthread_join (read_db_thread, NULL);
+    // if (read (database_path))
+    // {
+    //     log ("[ERROR]: Cannot read data file\n");
+    //     return -1;
+    // }
     log ("[INFO]: Start server on port %d...\n", listen_port);
     return run_server();
 }

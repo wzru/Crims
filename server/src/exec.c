@@ -41,9 +41,17 @@ inline int exec_single (char *sql)
         byte res = do_select (root->select, &rec, &recs, 0,
                               is_grpby = (root->select->group != NULL),
                               is_odrby = (root->select->order != NULL));
-        if (res != ERROR && crims_status == STATUS_SHELL)
+        if (res != ERROR)
         {
-            print_result (&recs);
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                //TODO
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                print_result (&recs);
+                break;
+            }
         }
         return res;
     }

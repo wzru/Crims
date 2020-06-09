@@ -72,7 +72,7 @@ inline int run_server()
                                                    (struct sockaddr *) &client_address,
                                                    &address_length);
                     FD_SET (client_socket, &client_sockets);
-                    log ("Client %s connected\n", inet_ntoa (client_address.sin_addr));
+                    log ("[INFO]: Client %s connected\n", inet_ntoa (client_address.sin_addr));
                 }
                 else
                 {
@@ -81,7 +81,7 @@ inline int run_server()
                     memset (send_buffer, 0, sizeof (send_buffer));
                     if (recv (client_sockets.fd_array[i], recv_buffer, BUFFER_LENGTH, 0) > 0)
                     {
-                        log ("Received client message:%s\n", recv_buffer);
+                        log ("[INFO]: Received client message: %s\n", recv_buffer);
                         exec (recv_buffer);
                         send (client_sockets.fd_array[i], recv_buffer, strlen (recv_buffer), 0);
                     }
