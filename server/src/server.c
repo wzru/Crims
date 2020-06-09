@@ -5,6 +5,7 @@
 
 #include "server.h"
 #include "exec.h"
+#include "log.h"
 
 //#pragma comment(lib,"ws2_32.lib")
 
@@ -19,14 +20,14 @@ inline int run_server()
     WSADATA wsa_data;
     if (WSAStartup (socket_version, &wsa_data) != 0)
     {
-        printf ("Initialize WSA ERROR!\n");
+        log ("[ERROR]: Initialize WSA failed!\n");
         return -1;
     }
     //创建套接字
     SOCKET server_socket = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server_socket == INVALID_SOCKET)
     {
-        printf ("Create socket ERROR!\n");
+        log ("[ERROR]: Create socket failed!\n");
         return -1;
     }
     //绑定IP和端口
@@ -39,16 +40,16 @@ inline int run_server()
     if (bind (server_socket, (LPSOCKADDR) &server_address,
               address_length) == SOCKET_ERROR)
     {
-        printf ("Bind ERROR!\n");
+        log ("[ERROR]: Bind address failed!\n");
         return -1;
     }
     //开始监听
     if (listen (server_socket, 10) == SOCKET_ERROR)
     {
-        printf ("Listen ERROR!\n");
+        log ("[ERROR]: Listen failed!\n");
         return -1;
     }
-    printf ("Server has been started...\n");
+    log ("[INFO]: Server has started...\n");
     //select非阻塞式
     fd_set client_sockets;
     FD_ZERO (&client_sockets);
@@ -71,7 +72,7 @@ inline int run_server()
                                                    (struct sockaddr *) &client_address,
                                                    &address_length);
                     FD_SET (client_socket, &client_sockets);
-                    printf ("Client %s connected\n", inet_ntoa (client_address.sin_addr));
+                    log ("Client %s connected\n", inet_ntoa (client_address.sin_addr));
                 }
                 else
                 {
@@ -80,7 +81,7 @@ inline int run_server()
                     memset (send_buffer, 0, sizeof (send_buffer));
                     if (recv (client_sockets.fd_array[i], recv_buffer, BUFFER_LENGTH, 0) > 0)
                     {
-                        printf ("Received client message:%s\n", recv_buffer);
+                        log ("Received client message:%s\n", recv_buffer);
                         exec (recv_buffer);
                         send (client_sockets.fd_array[i], recv_buffer, strlen (recv_buffer), 0);
                     }

@@ -21,10 +21,13 @@ endif(CMAKE_BUILD_TYPE MATCHES Debug)
 add_executable(crims_server ${DIR_SRCS})
 
 if(WIN32)
+  message("Build on WIN32...")
   target_link_libraries(crims_server WS2_32)
+  # target_link_libraries(crims_server libpthread.a)
+else()
+  message("Not build on WIN32...")
 endif()
 target_link_libraries(crims_server parser.lib)
-
 add_custom_target(parser)
 add_custom_command(
     TARGET parser
