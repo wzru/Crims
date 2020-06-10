@@ -1,5 +1,7 @@
 # SQL Executor Feature List
 
+## SELECT
+
 - [x] SELECT code FROM CAR_TYPE;
 - [x] SELECT code, cname, gear, daily_rent 
   FROM CAR_INFO
@@ -116,3 +118,7 @@
          GROUP BY RENT_ORDER.identity_number
          ORDER BY money desc 
          LIMIT 10;
+
+## INSERT
+
+- [x] INSERT INTO CAR_TYPE VALUES ('6', '跑车', 100);

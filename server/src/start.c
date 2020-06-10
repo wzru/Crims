@@ -24,7 +24,7 @@ inline int start (int argc, char *argv[])
             break;//可能对带空格的路径支持有问题, 需要加引号
         }
     }
-    log ("[INFO]: Reading data from '%s'...\n", database_path);
+    plog ("[INFO]: Reading data from '%s'...\n", database_path);
     //多线程处理, IO不等待
     pthread_t read_db_thread;
     pthread_create (&read_db_thread, NULL, read, database_path);
@@ -32,9 +32,9 @@ inline int start (int argc, char *argv[])
     pthread_join (read_db_thread, NULL);
     // if (read (database_path))
     // {
-    //     log ("[ERROR]: Cannot read data file\n");
+    //     plog ("[ERROR]: Cannot read data file\n");
     //     return -1;
     // }
-    log ("[INFO]: Start server on port %d...\n", listen_port);
+    plog ("[INFO]: Start server on port %d...\n", listen_port);
     return run_server();
 }

@@ -6,7 +6,7 @@
 // extern FILE *log_stream = NULL;
 // extern char log_path[PATH_LENGTH];
 
-inline void log (const char *fmt, ...);
+inline void plog (const char *fmt, ...);
 inline void initialize_log();
 
 #endif

@@ -5,6 +5,7 @@
 #include "select.h"
 #include "database.h"
 #include "define.h"
+#include "debug.h"
 #include "json.h"
 #include "ast.h"
 
@@ -324,4 +325,14 @@ inline void database_initialize()
 {
     read (database_path);
     query_initialize();
+}
+
+inline int find_table_by_name (char *table)
+{
+    for (int i = 0; i < catalog.tc; ++i)
+        if (!stricmp (table, catalog.tbls[i].name))
+        {
+            return i;
+        }
+    return ERROR;
 }

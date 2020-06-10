@@ -9,6 +9,10 @@
 #define DEFAULT_DATABASE_PATH "../data/.db"
 extern char database_path[PATH_LENGTH];
 
+#define TABLE_CAR_TYPE 0
+#define TABLE_CAR_INFO 1
+#define TABLE_RENT_ORDER 2
+
 extern CarTypeNode *head;
 extern CarTypeNode *ct_ptr;
 extern CarInfoNode *ci_ptr;
@@ -70,5 +74,7 @@ inline void print_rent_order (RentOrder *ro, FILE *stream);
 inline void insert_car_type (CarType *ct);
 inline void insert_car_info (CarInfo *ci);
 inline void insert_rent_order (RentOrder *ro);
+
+inline int find_table_by_name(char *table);
 
 #endif

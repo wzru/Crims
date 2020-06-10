@@ -99,3 +99,13 @@ inline void jsonify_result (Records *recs)
     }
 }
 #undef next
+
+inline void jsonify_error()
+{
+    sprintf (json_buffer, "{\nsuccess:false\n}");
+}
+
+inline void jsonify_success()
+{
+    sprintf (json_buffer, "{\nsuccess:true\n}");
+}

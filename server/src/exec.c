@@ -5,11 +5,13 @@
 #include "database.h"
 #include "strptime.h"
 #include "analyze.h"
+#include "insert.h"
 #include "select.h"
 #include "shell.h"
 #include "debug.h"
 #include "json.h"
 #include "ast.h"
+#include "log.h"
 
 char single_command[COMMAND_BUFFER_LENGTH];
 ExprNode error_expr = {.type = EXPR_ERROR},
@@ -39,9 +41,9 @@ inline int exec_single (char *sql)
         // {
         //     return STATUS_ERROR;
         // }
-        byte res = do_select (root->select, &rec, &recs, 0,
-                              is_grpby = (root->select->group != NULL),
-                              is_odrby = (root->select->order != NULL));
+        int res = do_select (root->select, &rec, &recs, 0,
+                             is_grpby = (root->select->group != NULL),
+                             is_odrby = (root->select->order != NULL));
         if (res != ERROR)
         {
             switch (crims_status)
@@ -52,6 +54,19 @@ inline int exec_single (char *sql)
             case STATUS_SHELL:
             case STATUS_EXEC:
                 print_result (&recs);
+                break;
+            }
+        }
+        else
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_error();
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[ERROR]: Select ERROR\n");
                 break;
             }
         }
@@ -67,10 +82,34 @@ inline int exec_single (char *sql)
     }
     else if (root->type == INSERT_STMT)
     {
-        // if (check_select (root->select, NULL))
-        // {
-        //     return STATUS_ERROR;
-        // }
+        int res = do_insert (root->insert);
+        if (res == ERROR)
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_error();
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[ERROR]: Insert ERROR\n");
+                break;
+            }
+            return ERROR;
+        }
+        else
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_success();
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[INFO]: Insert successfully\n");
+                break;
+            }
+        }
         return 0;
     }
     else if (root->type == UPDATE_STMT)

@@ -26,7 +26,7 @@ inline int check_table (char *table, TableColumnArray *p)
             }
             return 0;
         }
-    log ("[ERROR]: Unknown table reference '%s'", table);
+    plog ("[ERROR]: Unknown table reference '%s'", table);
     return 1;
 }
 
@@ -40,7 +40,7 @@ inline int check_table_column (char *table, char *column, TableColumnArray *p)
                 return 0;
             }
         }
-    log ("[ERROR]: Unknown column reference '%s.%s'", table, column);
+    plog ("[ERROR]: Unknown column reference '%s.%s'", table, column);
     return 1;
 }
 

@@ -19,7 +19,7 @@ inline void initialize_log()
     }
 }
 
-inline void log (const char *fmt, ...)
+inline void plog (const char *fmt, ...)
 {
     va_list args;
     va_start (args, fmt);
