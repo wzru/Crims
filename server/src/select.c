@@ -67,6 +67,9 @@ inline int append_record_table (TableNode *table, Record *rec)
 
 #define check_need(status, type) (((status)>>type)&1)
 
+/*
+    status的3位分别表示3个表是否需要提取出来数据
+*/
 inline void load_data_recursively (int status, Record *rec, CarTypeNode *ct,
                                    CarInfoNode *ci, RentOrderNode *ro, int type)
 {
@@ -136,7 +139,7 @@ inline void load_record (Record *rec)
     {
         //rec->siz[i] = isiz[rec->tbl[i]];
         rec->siz[i] = 0;
-        rec->ptr[i] = rec->arr[i] = malloc (isiz[rec->tbl[i]] * icnt[rec->tbl[i]]);
+        rec->ptr[i] = rec->arr[i] = calloc (icnt[rec->tbl[i]], isiz[rec->tbl[i]]);
         status |= (1 << rec->tbl[i]);
     }
     load_data (status, rec);
@@ -279,13 +282,13 @@ inline int get_index_by_table_column (char *table, char *column, Record *rec)
     if (!cnt)
     {
         plog ("[ERROR](%d): Unknown column '%s.%s'.", -UNKNOWN_TABLE, table,
-             column);
+              column);
         return UNKNOWN_COLUMN;
     }
     else if (cnt > 1)
     {
         plog ("[ERROR](%d): Ambiguous column '%s.%s'.", -AMBIGUOUS_COLUMN, table,
-             column);
+              column);
         return AMBIGUOUS_COLUMN;
     }
     else
@@ -609,7 +612,7 @@ inline ExprNode *eval_func (ExprNode *func, Record *rec)
         }
     }
     plog ("[ERROR](%d): Invalid function statement %s.",
-         INVALID_FUNCTION_STATEMENT, func->text);
+          INVALID_FUNCTION_STATEMENT, func->text);
     return &error_expr;
 }
 
@@ -626,7 +629,7 @@ inline ExprNode *eval_mod_expr (ExprNode *l, ExprNode *r, Record *rec)
     else
     {
         plog ("[ERROR](%d): There is no matching operator \%.",
-             -NO_MATCHING_OPERATOR);
+              -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -644,7 +647,7 @@ inline ExprNode *eval_neg_expr (ExprNode *r, Record *rec)
     else
     {
         plog ("[ERROR](%d): There is no matching operator -.",
-             -NO_MATCHING_OPERATOR);
+              -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -662,7 +665,7 @@ inline ExprNode *eval_not_expr (ExprNode *r, Record *rec)
     else
     {
         plog ("[ERROR](%d): There is no matching operator ~.",
-             -NO_MATCHING_OPERATOR);
+              -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -680,7 +683,7 @@ inline ExprNode *eval_like_expr (ExprNode *l, ExprNode *r, Record *rec)
     else
     {
         plog ("[ERROR](%d): There is no matching operator `LIKE`.",
-             -NO_MATCHING_OPERATOR);
+              -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
 }
@@ -928,7 +931,7 @@ inline int calc_col_cnt (TableNode *table_head)
         if (tmp == -1)
         {
             plog ("[ERROR](%d): Unknown table name '%s'.", UNKNOWN_TABLE,
-                 table_head->table);
+                  table_head->table);
             return 0;
         }
         else
@@ -1031,7 +1034,7 @@ inline int build_odr_col (ExprNode *odr)
         if ( (ocol_prop[ocol_cnt] = get_column_index (odr->strval)) == ERROR)
         {
             plog ("[ERROR](%d): Unknown orderby expression %s.",
-                 UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
+                  UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
             return ERROR;
         }
         odr = odr->next;
@@ -1227,6 +1230,7 @@ inline void clear_record (Record *rec)
     for (int i = 0; i < DATABASE_TABLE_COUNT; ++i)
     {
         free (rec->arr[i]);
+        rec->arr[i] = NULL;//不清零会导致下次释放非法内存
         rec->siz[i] = 0;
     }
 }

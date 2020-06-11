@@ -29,7 +29,7 @@ DatabaseInfo catalog =
         {
             "CAR_TYPE", 3,
             {
-                {"code",     EXPR_STRING, sizeof (char),         offsetof (CarType, code) },
+                {"code",     EXPR_STRING, CAR_TYPE_CODE_LENGTH,  offsetof (CarType, code) },
                 {"tname",    EXPR_STRING, CAR_TYPE_TNAME_LENGTH, offsetof (CarType, tname) },
                 {"quantity", EXPR_INTNUM, sizeof (int),          offsetof (CarType, quantity) }
             }
@@ -39,11 +39,11 @@ DatabaseInfo catalog =
             {
                 {"cid",        EXPR_INTNUM,    sizeof (int),                 offsetof (CarInfo, cid) },
                 {"plate",      EXPR_STRING,    CAR_INFORMATION_PLATE_LENGTH, offsetof (CarInfo, plate) },
-                {"code",       EXPR_STRING,    sizeof (char),                offsetof (CarInfo, code) },
+                {"code",       EXPR_STRING,    CAR_TYPE_CODE_LENGTH,         offsetof (CarInfo, code) },
                 {"cname",      EXPR_STRING,    CAR_INFORMATION_CNAME_LENGTH, offsetof (CarInfo, cname) },
                 {"gear",       EXPR_STRING,    CAR_INFORMATION_GEAR_LENGTH,  offsetof (CarInfo, gear) },
                 {"daily_rent", EXPR_APPROXNUM, sizeof (float),               offsetof (CarInfo, daily_rent) },
-                {"rent",       EXPR_STRING,    sizeof (char),                offsetof (CarInfo, rent) }
+                {"rent",       EXPR_STRING,    sizeof (char) * 2,            offsetof (CarInfo, rent) }
             }
         },
         {
@@ -206,13 +206,13 @@ inline int write (char *db)
 inline void input_car_type (CarType *ct)
 {
     memset (ct, 0, sizeof (CarType));
-    scanf (" %c%s%d", & (ct->code), ct->tname, & (ct->quantity));
+    scanf ("%s%s%d", ct->code, ct->tname, & (ct->quantity));
 }
 inline void input_car_info (CarInfo *ci)
 {
     memset (ci, 0, sizeof (CarInfo));
-    scanf ("%d%s %c%s%s%f %c", & (ci->cid), (ci->plate), & (ci->code), (ci->cname),
-           (ci->gear), & (ci->daily_rent), & (ci->rent));
+    scanf ("%d%s%s%s%s%f%s", & (ci->cid), (ci->plate), (ci->code), (ci->cname),
+           (ci->gear), & (ci->daily_rent), (ci->rent));
 }
 inline void input_rent_order (RentOrder *ro)
 {
@@ -225,29 +225,29 @@ inline void input_rent_order (RentOrder *ro)
 
 inline void insert_car_type (CarType *ct)
 {
-    ct_ptr->next = malloc (sizeof (CarTypeNode));
+    ct_ptr->next = calloc (1, sizeof (CarTypeNode));
     ct_ptr = ct_ptr->next;
     //ct_ptr->ct = *ct;
     memcpy (& (ct_ptr->ct), ct, sizeof (CarType));
-    ci_ptr = ct_ptr->head = malloc (sizeof (CarInfoNode));
+    ci_ptr = ct_ptr->head = calloc (1, sizeof (CarInfoNode));
     ci_ptr->next = NULL;
     ct_ptr->next = NULL;
-    ro_ptr = ci_ptr->head = malloc (sizeof (RentOrderNode));
+    ro_ptr = ci_ptr->head = calloc (1, sizeof (RentOrderNode));
     ro_ptr->next = NULL;
 }
 
 inline void insert_car_info (CarInfo *ci)
 {
     for (CarTypeNode *p = head->next; p; p = p->next)
-        if (p->ct.code == ci->code)
+        if (!stricmp (p->ct.code, ci->code))
         {
             CarInfoNode *q;
             for (q = p->head; q->next; q = q->next);
-            q->next = malloc (sizeof (CarInfoNode));
+            q->next = calloc (1, sizeof (CarInfoNode));
             memcpy (& (q->next->ci), ci, sizeof (CarInfo));
             //q->next->ci = *ci;
             q->next->next = NULL;
-            q->next->head = malloc (sizeof (RentOrderNode));
+            q->next->head = calloc (1, sizeof (RentOrderNode));
             q->next->head->next = NULL;
             return;
         }
@@ -261,7 +261,7 @@ inline void insert_rent_order (RentOrder *ro)
             {
                 RentOrderNode *r;
                 for (r = q->head; r->next; r = r->next);
-                r->next = malloc (sizeof (RentOrderNode));
+                r->next = calloc (1, sizeof (RentOrderNode));
                 memcpy (& (r->next->ro), ro, sizeof (RentOrder));
                 //r->next->ro = *ro;
                 r->next->next = NULL;
@@ -335,4 +335,21 @@ inline int find_table_by_name (char *table)
             return i;
         }
     return ERROR;
+}
+
+inline int find_column_by_name (int ti, char *col)
+{
+    for (int i = 0; i < catalog.tbls[ti].cc; ++i)
+        if (!stricmp (col, catalog.tbls[ti].cols[i].name))
+        {
+            return i;
+        }
+    return ERROR;
+}
+
+inline int can_assign (u16 type1, u16 type2)
+{
+    return (max (type1, type2) <= EXPR_APPROXNUM
+            || (min (type1, type2) >= EXPR_STRING
+                && max (type1, type2) <= EXPR_DATETIME));
 }

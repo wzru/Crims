@@ -8,7 +8,7 @@
 
 inline void output_car_type (CarType *ct)
 {
-    // printf ("code:'%c'\n", ct->code);
+    // printf ("code:'%s'\n", ct->code);
     // printf ("name:'%*s'\n", CAR_TYPE_NAME_LENGTH, ct->name);
     // printf ("quantity:%d\n", ct->quantity);
     memset (json_buffer, 0, JSON_BUFFER_LENGTH);
@@ -34,7 +34,8 @@ inline void output_rent_order (RentOrder *ro)
 
 inline int test_read_write() //用来测试读写是否正常
 {
-    read (database_path);
+    //read (database_path);
+    read_initialize();
     char s[20];
     int type;
     CarType ct;

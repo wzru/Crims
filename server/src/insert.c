@@ -6,15 +6,6 @@
 #include "debug.h"
 #include "log.h"
 
-#define can_comp(lhs, rhs) (max(lhs->type, rhs->type)<=EXPR_APPROXNUM || (min(lhs->type, rhs->type)>=EXPR_STRING && max(lhs->type, rhs->type)<=EXPR_DATETIME))
-
-inline int can_assign (u16 type1, u16 type2)
-{
-    return (max (type1, type2) <= EXPR_APPROXNUM
-            || (min (type1, type2) >= EXPR_STRING
-                && max (type1, type2) <= EXPR_DATETIME));
-}
-
 inline void *get_val_addr (ExprNode *expr)
 {
     if (expr == NULL)
@@ -46,6 +37,7 @@ inline int do_insert (InsertNode *insert)
     void *buf = NULL;
     if (ti == ERROR)
     {
+        plog ("[ERROR]: Unknown table name\n");
         return ERROR;
     }
     int ccnt = 0;

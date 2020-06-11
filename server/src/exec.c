@@ -5,6 +5,7 @@
 #include "database.h"
 #include "strptime.h"
 #include "analyze.h"
+#include "delete.h"
 #include "insert.h"
 #include "select.h"
 #include "shell.h"
@@ -37,10 +38,6 @@ inline int exec_single (char *sql)
     }
     else if (root->type == SELECT_STMT)
     {
-        // if (check_select (root->select, NULL))
-        // {
-        //     return STATUS_ERROR;
-        // }
         int res = do_select (root->select, &rec, &recs, 0,
                              is_grpby = (root->select->group != NULL),
                              is_odrby = (root->select->order != NULL));
@@ -53,6 +50,7 @@ inline int exec_single (char *sql)
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
+                plog("[INFO]: Select sucessfully!\n");
                 print_result (&recs);
                 break;
             }
@@ -66,7 +64,7 @@ inline int exec_single (char *sql)
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
-                plog ("[ERROR]: Select ERROR\n");
+                plog ("[ERROR]: Select failed!\n");
                 break;
             }
         }
@@ -74,10 +72,34 @@ inline int exec_single (char *sql)
     }
     else if (root->type == DELETE_STMT)
     {
-        // if (check_select (root->select, NULL))
-        // {
-        //     return STATUS_ERROR;
-        // }
+        int res = do_delete (root->delete);
+        if (res == ERROR)
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_error();
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[ERROR]: Delete failed!\n");
+                break;
+            }
+            return ERROR;
+        }
+        else
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_success();
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[INFO]: Delete successfully\n");
+                break;
+            }
+        }
         return 0;
     }
     else if (root->type == INSERT_STMT)
@@ -92,7 +114,7 @@ inline int exec_single (char *sql)
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
-                plog ("[ERROR]: Insert ERROR\n");
+                plog ("[ERROR]: Insert failed!\n");
                 break;
             }
             return ERROR;
@@ -137,6 +159,7 @@ inline int exec (char *command)
             strncpy (single_command, command + start, i - start + 1);
             start = i + 1;
             single_command[start] = '\0';
+            plog ("[INFO]: Execute '%s'\n", single_command);
             res = exec_single (single_command);
         }
     }

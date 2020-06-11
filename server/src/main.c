@@ -3,6 +3,7 @@
 
 #include "database.h"
 #include "define.h"
+#include "debug.h"
 #include "shell.h"
 #include "start.h"
 #include "help.h"
@@ -24,7 +25,6 @@ int main (int argc, char *argv[])
     case 1:
         crims_status = STATUS_SHELL;
         return shell (argc, argv); //控制权移交shell
-        //return test_read_write();
         break;
     default:
         if (!strcmp (argv[1], "--help"))
@@ -46,9 +46,9 @@ int main (int argc, char *argv[])
             crims_status = STATUS_EXEC;
             return argc > 2 ? (read(database_path), exec (argv[2])) : 0;//直接执行SQL
         }
-        else if(!strcmp(argv[1], "debug"))
+        else if(!strcmp(argv[1], "test"))
         {
-            //return debug();
+            return test_read_write();
         }
     }
     return 0;

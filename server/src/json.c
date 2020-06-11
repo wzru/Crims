@@ -4,14 +4,14 @@
 
 inline void jsonify_car_type (CarType *ct, char *json)
 {
-    sprintf (json, "{\"code\":\"%c\",\"tname\":\"%s\",\"quantity\":%d}",
+    sprintf (json, "{\"code\":\"%s\",\"tname\":\"%s\",\"quantity\":%d}",
              ct->code, ct->tname, ct->quantity);
 }
 
 inline void jsonify_car_info (CarInfo *ci, char *json)
 {
     sprintf (json,
-             "{\"cid\":%d,\"plate\":\"%s\",\"code\":\"%c\",\"cname\":\"%s\",\"gear\":\"%s\",\"daily_rent\":%f,\"rent\":\"%c\"}",
+             "{\"cid\":%d,\"plate\":\"%s\",\"code\":\"%s\",\"cname\":\"%s\",\"gear\":\"%s\",\"daily_rent\":%f,\"rent\":\"%s\"}",
              ci->cid, ci->plate, ci->code, ci->cname, ci->gear, ci->daily_rent, ci->rent
             );
 }

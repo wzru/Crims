@@ -6,10 +6,11 @@
 #define PATCH_VERSION 0
 
 //基本数据结构定义
+#define CAR_TYPE_CODE_LENGTH 3
 #define CAR_TYPE_TNAME_LENGTH 20
 struct CarType//车辆分类信息结构体
 {
-    char code;//车辆类型编码, '1'-'5'
+    char code[CAR_TYPE_CODE_LENGTH];//车辆类型编码, '1'-'5'
     char tname[CAR_TYPE_TNAME_LENGTH];//车辆类型名称：经济型、商务型、豪华型、SUV、7座及以上车型
     int quantity;//库存数量
 };
@@ -22,11 +23,11 @@ struct CarInfo//车辆基本信息结构体
 {
     int cid;//车辆编号, 顺序增加
     char plate[CAR_INFORMATION_PLATE_LENGTH];//车牌号
-    char code;//车辆类型编码, '1'-'5'
+    char code[CAR_TYPE_CODE_LENGTH];//车辆类型编码, '1'-'5'
     char cname[CAR_INFORMATION_CNAME_LENGTH];//车辆名称
     char gear[CAR_INFORMATION_GEAR_LENGTH];//排挡方式
     float daily_rent;//每日租金
-    char rent;//出租状态, 'y' | 'n'
+    char rent[2];//出租状态, 'y' | 'n'
 };
 typedef struct CarInfo CarInfo;
 

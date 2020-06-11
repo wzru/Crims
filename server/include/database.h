@@ -75,6 +75,9 @@ inline void insert_car_type (CarType *ct);
 inline void insert_car_info (CarInfo *ci);
 inline void insert_rent_order (RentOrder *ro);
 
-inline int find_table_by_name(char *table);
+inline int find_table_by_name (char *table);
+inline int find_column_by_name (int ti, char *col);
+
+inline int can_assign (u16 type1, u16 type2);
 
 #endif
