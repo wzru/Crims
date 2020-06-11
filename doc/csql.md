@@ -1,4 +1,4 @@
-# Application Programming Interface                                                                                                                                                                                                                                                                                        
+# Crims Structured Query Language                                                                                                                                                                                                                                                                                    
 
 ## Connection
 
@@ -10,7 +10,7 @@
 
 **Crims Structured Query Language(CSQL)**是SQL的一门方言，是专为Crims设计的一门DSL。CSQL大小写不敏感。  
 
-### TYPE
+### 类型
 
 | 类型名         | 描述                                                         |
 | -------------- | ------------------------------------------------------------ |
@@ -19,7 +19,7 @@
 | float(size, d) | 带有浮动小数点的小数字。在括号中规定最大位数。在 d 参数中规定小数点右侧的最大位数。 |
 | datetime       | 日期和时间的组合。格式：YYYY/MM/DD-HH:MM                     |
 
-### TABLES & COLOUMS Definition
+### 表/列定义
 
 CSQL有且仅有如下TABLES和COLOUMS定义：
 
@@ -34,7 +34,7 @@ CSQL有且仅有如下TABLES和COLOUMS定义：
 ```sql
 CREATE TABLE CAR_TYPE
 (
-    code char(1) NOT NULL PRIMARY KEY,
+    code char(3) NOT NULL PRIMARY KEY,
     tname char(20),
     quantity int
 );
@@ -53,11 +53,11 @@ CREATE TABLE CAR_INFO
 (
 	cid int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     plate char(10),
-    code char(1),
+    code char(3),
     cname char(20),
     gear char(10),
     daily_rent float(10,2),
-    rent char(1)
+    rent char(2)
 ); 
 ```
 
