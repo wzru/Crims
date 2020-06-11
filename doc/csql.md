@@ -260,7 +260,7 @@ DELETE FROM CAR_TYPE
 ```sql
 SELECT code, cname, gear, daily_rent 
 	FROM CAR_INFO
-	WHERE rent='n' 
+	WHERE rent='y' 
 	AND code IN (SELECT code 
                  FROM CAR_TYPE 
         	     WHERE tname="经济型");
