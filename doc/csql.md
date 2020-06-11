@@ -365,9 +365,9 @@ SELECT *
 >  统计当前每种车辆类型的车辆总数、已出租数、未出租数。
 
 ```sql
-SELECT CAR_TYPE.tname, 
-	   CAR_TYPE.quantity, 
-	   SUM(CAR_INFO.rent='y') AS "已出租数", 
+SELECT CAR_TYPE.tname AS "车辆类型名称",
+	   CAR_TYPE.quantity AS "车辆总数", 
+	   SUM(CAR_INFO.rent='y') AS "已出租数",
 	   SUM(CAR_INFO.rent='n') AS "未出租数"
 	FROM CAR_TYPE, CAR_INFO
     WHERE CAR_TYPE.code=CAR_INFO.code
@@ -377,7 +377,8 @@ SELECT CAR_TYPE.tname,
 > 统计每月每种车辆类型的营业额（产生的实缴费用）
 
 ```sql
-SELECT CAR_TYPE.tname, SUM(RENT_ORDER.actual_fee)
+SELECT CAR_TYPE.tname AS "车辆类型", 
+	   SUM(RENT_ORDER.actual_fee) AS "营业额"
     FROM CAR_TYPE, CAR_INFO, RENT_ORDER
     WHERE CAR_TYPE.code = CAR_INFO.code
     AND CAR_INFO.cid = RENT_ORDER.cid
@@ -395,6 +396,15 @@ SELECT CAR_INFO.plate,
        SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365 AS "租用率"
        FROM CAR_INFO, RENT_ORDER
        WHERE CAR_INFO.cid=RENT_ORDER.cid
+       GROUP BY CAR_INFO.plate;
+       
+SELECT CAR_INFO.plate AS "车牌号", 
+	   CAR_INFO.cname AS "车辆名称", 
+	   SUM(RENT_ORDER.actual_fee) AS "营业额", 
+       SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "租用天数"
+       FROM CAR_INFO, RENT_ORDER
+       WHERE CAR_INFO.cid=RENT_ORDER.cid
+       AND RENT_ORDER.pickup_time >= '2019-01-01' AND RENT_ORDER.pickup_time <= '2019-12-31'
        GROUP BY CAR_INFO.plate;
 ```
 
@@ -426,6 +436,17 @@ SELECT CAR_INFO.plate,
        GROUP BY CAR_INFO.plate
        ORDER BY "累计出租天数" desc, "营业额" desc 
        LIMIT 10;
+       
+SELECT CAR_INFO.plate AS "车牌号",
+  	   CAR_INFO.cname AS "车辆名称",
+  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "累计出租天数",
+         SUM(RENT_ORDER.actual_fee) AS "营业额"
+         FROM CAR_INFO, RENT_ORDER
+         WHERE CAR_INFO.cid=RENT_ORDER.cid
+         AND RENT_ORDER.pickup_time > '2019-1-1' 
+         GROUP BY CAR_INFO.plate
+         ORDER BY "累计出租天数" desc
+         LIMIT 10;
 ```
 
 > 列出当年以来累计消费最多的顾客信息，按消费金额降序排序后输出。

@@ -187,4 +187,83 @@ SELECT *
 
 ## 3. 数据统计
 
-总共只要求4种数据统计图，因此考虑SQL查询语句直接写死，条形图的格式也可以分别写一个（TODO）
+总共只要求绘制4种数据统计表/图，因此考虑SQL查询语句直接写定，数据表/条形图的格式分别写定
+
+1. 统计当前每种车辆类型的车辆总数、已出租数、未出租数
+
+```sql
+SELECT CAR_TYPE.tname AS "车辆类型名称",
+	   CAR_TYPE.quantity AS "车辆总数", 
+	   SUM(CAR_INFO.rent='y') AS "已出租数",
+	   SUM(CAR_INFO.rent='n') AS "未出租数"
+	FROM CAR_TYPE, CAR_INFO
+    WHERE CAR_TYPE.code=CAR_INFO.code
+    GROUP BY CAR_TYPE.tname;
+```
+
+输出表格样式：
+
+![image-20200611195219532](http://shaw.wang:9888/images/2020/06/11/image-20200611195219532.png)
+
+2. 统计每月每种车辆类型的营业额（产生的实缴费用） ，输出当月每种车辆类型的营业额柱状统计图
+
+   TIPS: 这里的年月让用户输入, 然后拼接为SQL语句
+
+```sql
+SELECT CAR_TYPE.tname AS "车辆类型", 
+	   SUM(RENT_ORDER.actual_fee) AS "营业额"
+    FROM CAR_TYPE, CAR_INFO, RENT_ORDER
+    WHERE CAR_TYPE.code = CAR_INFO.code
+    AND CAR_INFO.cid = RENT_ORDER.cid
+    AND RENT_ORDER.pickup_time > '2019-2-1' 
+    AND RENT_ORDER.pickup_time < '2019-2-28'
+    GROUP BY CAR_TYPE.tname;
+```
+
+输出表格样式:
+
+![image-20200611195614525](http://shaw.wang:9888/images/2020/06/11/image-20200611195614525.png)
+
+输出图片样式:
+
+![image-20200611195640704](http://shaw.wang:9888/images/2020/06/11/image-20200611195640704.png)
+
+3. 输入年份，统计该年每辆车的营业额（产生的实缴费用）、租用率
+
+   TIPS: 第4列只SELECT出了租用天数, 需要除以总天数(365)才能获得租用率. 如果是2020年(因为还没过完), 那么分母应该改为「今天是今年的第几天」, 才能正确计算租用率
+
+```sql
+SELECT CAR_INFO.plate AS "车牌号", 
+	   CAR_INFO.cname AS "车辆名称", 
+	   SUM(RENT_ORDER.actual_fee) AS "营业额", 
+       SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "租用天数"
+       FROM CAR_INFO, RENT_ORDER
+       WHERE CAR_INFO.cid=RENT_ORDER.cid
+       AND RENT_ORDER.pickup_time >= '2019-01-01' AND RENT_ORDER.pickup_time <= '2019-12-31'
+       GROUP BY CAR_INFO.plate;
+```
+
+输出表格样式:
+
+![image-20200611200349517](http://shaw.wang:9888/images/2020/06/11/image-20200611200349517.png)
+
+4. 列出**当年**来累计出租天数最多的 10 辆车的出租信息，按累计出租天数降序排序后输出。
+
+   TIPS: 第3列只SELECT出了租用天数, 需要除以「今天是今年的第几天」, 才能得到租用率
+
+```sql
+SELECT CAR_INFO.plate AS "车牌号",
+  	   CAR_INFO.cname AS "车辆名称",
+  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "累计出租天数",
+         SUM(RENT_ORDER.actual_fee) AS "营业额"
+         FROM CAR_INFO, RENT_ORDER
+         WHERE CAR_INFO.cid=RENT_ORDER.cid
+         AND RENT_ORDER.pickup_time > '2019-1-1' 
+         GROUP BY CAR_INFO.plate
+         ORDER BY "累计出租天数" desc
+         LIMIT 10;
+```
+
+输出表格样式:
+
+![image-20200611201221038](http://shaw.wang:9888/images/2020/06/11/image-20200611201221038.png)

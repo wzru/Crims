@@ -54,10 +54,10 @@ inline int append_record_table (TableNode *table, Record *rec)
         }
     else
     {
-        plog ("[ERROR](%d): Unknown table type.", -UNKNOWN_TABLE);
+        plog ("[ERROR](%d): Unknown table type.\n", -UNKNOWN_TABLE);
         return ERROR;
     }
-    plog ("[ERROR](%d): Table NOT exists.", -TABLE_NOT_EXIST);
+    plog ("[ERROR](%d): Table NOT exists.\n", -TABLE_NOT_EXIST);
     return ERROR;
 }
 
@@ -253,12 +253,12 @@ inline int get_index_by_name (char *name, Record *rec)
     }
     if (!cnt)
     {
-        plog ("[ERROR](%d): Unknown column '%s'.", -UNKNOWN_TABLE, name);
+        plog ("[ERROR](%d): Unknown column '%s'.\n", -UNKNOWN_TABLE, name);
         return UNKNOWN_COLUMN;
     }
     else if (cnt > 1)
     {
-        plog ("[ERROR](%d): Ambiguous column '%s'.", -AMBIGUOUS_COLUMN, name);
+        plog ("[ERROR](%d): Ambiguous column '%s'.\n", -AMBIGUOUS_COLUMN, name);
         return AMBIGUOUS_COLUMN;
     }
     else
@@ -281,13 +281,13 @@ inline int get_index_by_table_column (char *table, char *column, Record *rec)
     }
     if (!cnt)
     {
-        plog ("[ERROR](%d): Unknown column '%s.%s'.", -UNKNOWN_TABLE, table,
+        plog ("[ERROR](%d): Unknown column '%s.%s'.\n", -UNKNOWN_TABLE, table,
               column);
         return UNKNOWN_COLUMN;
     }
     else if (cnt > 1)
     {
-        plog ("[ERROR](%d): Ambiguous column '%s.%s'.", -AMBIGUOUS_COLUMN, table,
+        plog ("[ERROR](%d): Ambiguous column '%s.%s'.\n", -AMBIGUOUS_COLUMN, table,
               column);
         return AMBIGUOUS_COLUMN;
     }
@@ -611,7 +611,7 @@ inline ExprNode *eval_func (ExprNode *func, Record *rec)
             }
         }
     }
-    plog ("[ERROR](%d): Invalid function statement %s.",
+    plog ("[ERROR](%d): Invalid function statement %s.\n",
           INVALID_FUNCTION_STATEMENT, func->text);
     return &error_expr;
 }
@@ -628,7 +628,7 @@ inline ExprNode *eval_mod_expr (ExprNode *l, ExprNode *r, Record *rec)
     }
     else
     {
-        plog ("[ERROR](%d): There is no matching operator \%.",
+        plog ("[ERROR](%d): There is no matching operator \%.\n",
               -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -646,7 +646,7 @@ inline ExprNode *eval_neg_expr (ExprNode *r, Record *rec)
     }
     else
     {
-        plog ("[ERROR](%d): There is no matching operator -.",
+        plog ("[ERROR](%d): There is no matching operator -.\n",
               -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -664,7 +664,7 @@ inline ExprNode *eval_not_expr (ExprNode *r, Record *rec)
     }
     else
     {
-        plog ("[ERROR](%d): There is no matching operator ~.",
+        plog ("[ERROR](%d): There is no matching operator ~.\n",
               -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -682,7 +682,7 @@ inline ExprNode *eval_like_expr (ExprNode *l, ExprNode *r, Record *rec)
     }
     else
     {
-        plog ("[ERROR](%d): There is no matching operator `LIKE`.",
+        plog ("[ERROR](%d): There is no matching operator `LIKE`.\n",
               -NO_MATCHING_OPERATOR);
         return &error_expr;
     }
@@ -785,7 +785,7 @@ inline ExprNode *eval_expr (ExprNode *expr, Record *rec)
     case EXPR_CASE_EXPR_ELSE:
         return eval_case (expr, rec);
     default:
-        plog ("[ERROR](%d): Unknown expression.", -UNKNOWN_EXPRESSION);
+        plog ("[ERROR](%d): Unknown expression.\n", -UNKNOWN_EXPRESSION);
         return &error_expr;
     }
 }
@@ -930,7 +930,7 @@ inline int calc_col_cnt (TableNode *table_head)
         int tmp = get_index_by_table_name (table_head->table);
         if (tmp == -1)
         {
-            plog ("[ERROR](%d): Unknown table name '%s'.", UNKNOWN_TABLE,
+            plog ("[ERROR](%d): Unknown table name '%s'.\n", UNKNOWN_TABLE,
                   table_head->table);
             return 0;
         }
@@ -1033,7 +1033,7 @@ inline int build_odr_col (ExprNode *odr)
         osc[ocol_cnt] = odr->sc;
         if ( (ocol_prop[ocol_cnt] = get_column_index (odr->strval)) == ERROR)
         {
-            plog ("[ERROR](%d): Unknown orderby expression %s.",
+            plog ("[ERROR](%d): Unknown orderby expression %s.\n",
                   UNKNOWN_ORDERBY_EXPRESSION, odr->strval);
             return ERROR;
         }
