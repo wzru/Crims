@@ -7,7 +7,7 @@
 #include "exec.h"
 #include "database.h"
 
-char command_buffer[COMMAND_BUFFER_LENGTH], sql[COMMAND_BUFFER_LENGTH];
+char command_buffer[BUFFER_LENGTH], sql[BUFFER_LENGTH];
 
 inline void print_command_prompt()
 {
@@ -26,7 +26,7 @@ inline int shell (int argc, char *argv[])
         print_command_prompt();
         int can_exec = 0, exec_pos = -1;
         memset (command_buffer, 0, sizeof (command_buffer));
-        fgets (command_buffer, COMMAND_BUFFER_LENGTH, stdin);
+        fgets (command_buffer, BUFFER_LENGTH, stdin);
         int l = strlen (command_buffer);
         for (int i = 0; i < l; ++i)
         {

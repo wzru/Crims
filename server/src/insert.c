@@ -6,7 +6,7 @@
 #include "debug.h"
 #include "log.h"
 
-inline void *get_val_addr (ExprNode *expr)
+inline void *get_val_addr (u16 dest, ExprNode *expr)
 {
     if (expr == NULL)
     {
@@ -15,9 +15,17 @@ inline void *get_val_addr (ExprNode *expr)
     switch (expr->type)
     {
     case EXPR_INTNUM:
-        return & (expr->intval);
+        if(dest==EXPR_APPROXNUM)
+        {
+            expr->floatval = expr->intval;
+            return & (expr->floatval);
+        } else return & (expr->intval);
     case EXPR_APPROXNUM:
-        return & (expr->floatval);
+        if(dest==EXPR_INTNUM)
+        {
+            expr->intval = expr->floatval;
+            return & (expr->intval);
+        } else return & (expr->floatval);
     case EXPR_STRING:
     case EXPR_DATETIME:
         return expr->strval;
@@ -49,7 +57,7 @@ inline int do_insert (InsertNode *insert)
         {
             if (can_assign (catalog.tbls[ti].cols[vcnt].type, v->type))
             {
-                memcpy (buf + catalog.tbls[ti].cols[vcnt].offset, get_val_addr (v),
+                memcpy (buf + catalog.tbls[ti].cols[vcnt].offset, get_val_addr (catalog.tbls[ti].cols[vcnt].type, v),
                         catalog.tbls[ti].cols[vcnt].size);
             }
             else

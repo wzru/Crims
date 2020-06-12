@@ -7,6 +7,7 @@
 #include "analyze.h"
 #include "delete.h"
 #include "insert.h"
+#include "server.h"
 #include "select.h"
 #include "shell.h"
 #include "debug.h"
@@ -14,7 +15,7 @@
 #include "ast.h"
 #include "log.h"
 
-char single_command[COMMAND_BUFFER_LENGTH];
+char single_command[BUFFER_LENGTH];
 ExprNode error_expr = {.type = EXPR_ERROR},
          null_expr = {.type = EXPR_NULL},
          lazy_expr = {.type = EXPR_LAZY},
