@@ -353,3 +353,14 @@ inline int can_assign (u16 type1, u16 type2)
             || (min (type1, type2) >= EXPR_STRING
                 && max (type1, type2) <= EXPR_DATETIME));
 }
+
+inline void update_ct_ptr()
+{
+    for (CarTypeNode *p = head->next; p; p = p->next)
+    {
+        if (p->next == NULL)
+        {
+            ct_ptr = p;
+        }
+    }
+}

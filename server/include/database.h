@@ -80,4 +80,6 @@ inline int find_column_by_name (int ti, char *col);
 
 inline int can_assign (u16 type1, u16 type2);
 
+inline void update_ct_ptr();
+
 #endif

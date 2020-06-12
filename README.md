@@ -2,7 +2,7 @@
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![windows](https://badgen.net/badge/icon/ONLY%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
 
-[![cmake](https://badgen.net/badge/dependency/CMake/red)](https://github.com/WangZhengru/Crims) [![flex-bison](https://badgen.net/badge/dependency/Flex%20&%20Bison/orange)](https://github.com/WangZhengru/Crims) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://github.com/WangZhengru/Crims)
+[![cmake](https://badgen.net/badge/dependency/CMake/red)](https://cmake.org/) [![flex-bison](https://badgen.net/badge/dependency/Flex/orange)](https://www.gnu.org/software/flex/) [![flex-bison](https://badgen.net/badge/dependency/Bison/pink)](https://www.gnu.org/software/bison/) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://nodejs.org/)
 
 "Car Rental Information Management System" from "Course Project of Programming" in HUST-CSE-2020-Spring
 
@@ -51,4 +51,4 @@ npm start
 
 ## License
 
-[GPL-3.0](https://github.com/WangZhengru/Crims/blob/master/LICENSE) © Wang Zhengru
+[GPL-3.0](https://github.com/WangZhengru/Crims/blob/master/LICENSE) © [WangZhengru](https://github.com/WangZhengru)

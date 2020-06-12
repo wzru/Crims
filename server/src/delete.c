@@ -61,6 +61,7 @@ inline int traverse_delete (int ti, int col, ExprNode *rhs)
             ++cnt;
             icnt[TABLE_CAR_INFO] -= ct_ci;
             icnt[TABLE_RENT_ORDER] -= ct_ro;
+            update_ct_ptr();
         }
     }
     return cnt;
