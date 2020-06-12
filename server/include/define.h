@@ -108,4 +108,6 @@ extern byte crims_status;
     #define min(a,b) ((a)>(b)?(b):(a))
 #endif
 
+extern char *help_info;
+
 #endif

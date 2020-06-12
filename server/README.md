@@ -10,7 +10,7 @@ cd Crims/server/bin
 ./crims_server start -p 8000 # start server on port 8000
 ./crims_server --help # get help
 ./crims_server --version # get version
-./crims_server # interactive shell
+./crims_server shell# interactive shell
 ./crims_server exec "some commands;" # execute some commands
 ```
 
@@ -23,5 +23,5 @@ cd Crims/server/bin
 - [x] SQL Parser
 - [x] SQL Executor
 - [x] JSON
-- [ ] Help Document
+- [x] Help Document
 - [x] Test
