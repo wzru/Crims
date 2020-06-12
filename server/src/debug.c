@@ -34,7 +34,7 @@ inline void output_rent_order (RentOrder *ro)
 
 inline int test_read_write() //用来测试读写是否正常
 {
-    //read (database_path);
+    //read_db (database_path);
     read_initialize();
     char s[20];
     int type;
@@ -71,7 +71,7 @@ inline int test_read_write() //用来测试读写是否正常
     }
     system ("chcp 65001");
     recursive_print (head->next, NULL, NULL, TYPE_CAR, stdout);
-    write (database_path);
+    write_db (database_path);
 }
 
 inline void print_args (int argc, char *argv[])

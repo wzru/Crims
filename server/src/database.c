@@ -104,7 +104,7 @@ inline void read_rent_order (FILE *stream)
     ro_ptr->next = NULL;
 }
 
-inline int read (char *db)
+inline int read_db (char *db)
 {
     read_initialize();
     FILE *fp = fopen (db, "rb");
@@ -189,7 +189,7 @@ inline void write_recursively (CarTypeNode *ct, CarInfoNode *ci,
     }
 }
 
-inline int write (char *db)
+inline int write_db (char *db)
 {
     FILE *fp = fopen (db, "wb");
     if (fp == NULL)
@@ -323,7 +323,7 @@ inline void recursive_print (CarTypeNode *ct, CarInfoNode *ci,
 
 inline void database_initialize()
 {
-    read (database_path);
+    read_db (database_path);
     query_initialize();
 }
 

@@ -13,8 +13,9 @@
 #define __GETOPT_H__
 
 /* All the headers include this file. */
+#if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
 #include <crtdefs.h>
-
+#endif
 #if defined( WINGETOPT_SHARED_LIB )
 # if defined( BUILDING_WINGETOPT_DLL )
 #  define WINGETOPT_API __declspec(dllexport)

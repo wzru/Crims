@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
         else if (!stricmp (argv[1], "exec"))
         {
             crims_status = STATUS_EXEC;
-            return argc > 2 ? (read (database_path), exec (argv[2])) : 0; //直接执行SQL
+            return argc > 2 ? (read_db (database_path), exec (argv[2])) : 0; //直接执行SQL
         }
         else if (!stricmp (argv[1], "test"))
         {

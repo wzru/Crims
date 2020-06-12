@@ -58,8 +58,8 @@ inline void read_car_type (FILE *stream);//从stream读入一个CarType
 inline void read_car_info (FILE *stream);//从stream读入一个CarInfo
 inline void read_rent_order (FILE *stream);//从stream读入一个RentOrder
 
-inline int read (char *db); //从db路径读入数据
-inline int write (char *db); //向db路径写入数据
+inline int read_db (char *db); //从db路径读入数据
+inline int write_db (char *db); //向db路径写入数据
 inline void recursive_print (CarTypeNode *ct, CarInfoNode *ci,//调试输出
                              RentOrderNode *ro, int type, FILE *stream);
 
