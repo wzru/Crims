@@ -42,7 +42,7 @@ inline int jsonify_value (char *json, ExprNode *val)
             return sprintf (json, "%.2f", val->floatval);
         case EXPR_STRING:
         case EXPR_DATETIME:
-            return sprintf (json, "'%s'", val->strval);
+            return sprintf (json, "\"%s\"", val->strval);
         }
     }
 }
@@ -56,7 +56,7 @@ inline void jsonify_result (Records *recs)
     char *p = json_buffer;
     clear_records (&result);
     uint row_cnt = 0;
-    p += sprintf (p, "{\nsuccess:true,\ndata:[\n");
+    p += sprintf (p, "{\"success\":true,\"data\":[");
     if (recs == NULL || recs->cnt == 0);
     else
     {
@@ -81,31 +81,31 @@ inline void jsonify_result (Records *recs)
         for (uint i = limit.start, cnt = 0; i < result.cnt
                 && cnt < limit.count; ++i, ++cnt)
         {
-            p += sprintf (p, "\t{");
+            p += sprintf (p, "{");
             for (uint j = 0; j < col_cnt; ++j)
             {
-                p += sprintf (p, "'%s':", col_name[j]);
+                p += sprintf (p, "\"%s\":", col_name[j]);
                 p += jsonify_value (p, & (result.recs[i].item[j]));
                 if (j != col_cnt - 1)
                 {
                     p += sprintf (p, ",");
                 }
             }
-            p += sprintf (p, "},\n");
+            p += sprintf (p, "},");
             ++row_cnt;
         }
-        p -= 2;
-        sprintf (p, "\n\t]\n}");
+        --p;
+        sprintf (p, "]}");
     }
 }
 #undef next
 
 inline void jsonify_error()
 {
-    sprintf (json_buffer, "{\nsuccess:false\n}");
+    sprintf (json_buffer, "{success:false}");
 }
 
 inline void jsonify_success()
 {
-    sprintf (json_buffer, "{\nsuccess:true\n}");
+    sprintf (json_buffer, "{success:true}");
 }
