@@ -1,12 +1,12 @@
 # Crims
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![windows](https://badgen.net/badge/icon/windows?icon=windows&label)](https://github.com/WangZhengru/Crims)
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![windows](https://badgen.net/badge/icon/only%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
 
-[![cmake](https://badgen.net/badge/dependency/CMake/red)](https://github.com/WangZhengru/Crims) [![flex-bison](https://badgen.net/badge/dependency/Flex&Bison/orange)](https://github.com/WangZhengru/Crims) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://github.com/WangZhengru/Crims)
+[![cmake](https://badgen.net/badge/dependency/CMake/red)](https://github.com/WangZhengru/Crims) [![flex-bison](https://badgen.net/badge/dependency/Flex%20&%20Bison/orange)](https://github.com/WangZhengru/Crims) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://github.com/WangZhengru/Crims)
 
-"Car Rental Information Management System" from "Course Project of Programming" in HUST-CST-2020-Spring
+"Car Rental Information Management System" from "Course Project of Programming" in HUST-CSE-2020-Spring
 
-只是一个课设玩具项目
+只是一个课设的toy project
 
 ## Features
 
@@ -41,7 +41,7 @@ npm start
 
 ## Requirements
 
-这个项目的完整编译运行依赖于flex, bison, cmake, node
+这个项目的完整编译/运行依赖于Flex, Bison, CMake, Node.js
 
  **服务端目前仅支持在Windows上运行**
 
