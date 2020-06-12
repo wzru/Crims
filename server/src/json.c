@@ -56,7 +56,7 @@ inline void jsonify_result (Records *recs)
     char *p = json_buffer;
     clear_records (&result);
     uint row_cnt = 0;
-    p += sprintf (p, "{\"success\":true,\"data\":[");
+    p += sprintf (p, "{\"type\":\"SELECT\",\"success\":true,\"data\":[");
     if (recs == NULL || recs->cnt == 0);
     else
     {
@@ -100,12 +100,12 @@ inline void jsonify_result (Records *recs)
 }
 #undef next
 
-inline void jsonify_error()
+inline void jsonify_error(char *type)
 {
-    sprintf (json_buffer, "{success:false}");
+    sprintf (json_buffer, "{\"type\":\"%s\",\"success\":false}", type);
 }
 
-inline void jsonify_success()
+inline void jsonify_success(char *type)
 {
-    sprintf (json_buffer, "{success:true}");
+    sprintf (json_buffer, "{\"type\":\"%s\",\"success\":true}", type);
 }

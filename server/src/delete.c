@@ -25,7 +25,8 @@ inline int is_equal (void *p, int ti, int col, ExprNode *rhs)
 inline int traverse_delete (int ti, int col, ExprNode *rhs)
 {
     int cnt = 0;
-    for (CarTypeNode *ct = head->next, *pct = head; ct; pct = ct, ct = ct->next)
+    for (CarTypeNode *ct = head->next, *pct = head; ct != NULL;
+            pct = ct, ct = ct->next)
     {
         int ct_ci = 0, ct_ro = 0;
         for (CarInfoNode *ci = ct->head->next, *pci = ct->head; ci;
@@ -38,7 +39,7 @@ inline int traverse_delete (int ti, int col, ExprNode *rhs)
                 if (ti == TABLE_RENT_ORDER && is_equal (&ro->ro, ti, col, rhs))
                 {
                     pro->next = ro->next;
-                    ro = ro->next;
+                    //ro = ro->next;
                     --icnt[ti];
                     ++cnt;
                 }
@@ -46,7 +47,7 @@ inline int traverse_delete (int ti, int col, ExprNode *rhs)
             if (ti == TABLE_CAR_INFO && is_equal (&ci->ci, ti, col, rhs))
             {
                 pci->next = ci->next;
-                ci = ci->next;
+                //ci = ci->next;
                 --icnt[ti];
                 ++cnt;
                 icnt[TABLE_RENT_ORDER] -= ci_ro;
@@ -55,7 +56,7 @@ inline int traverse_delete (int ti, int col, ExprNode *rhs)
         if (ti == TABLE_CAR_TYPE && is_equal (&ct->ct, ti, col, rhs))
         {
             pct->next = ct->next;
-            ct = ct->next;//memory leak
+            //ct = ct->next;//memory leak
             --icnt[ti];
             ++cnt;
             icnt[TABLE_CAR_INFO] -= ct_ci;

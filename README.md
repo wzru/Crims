@@ -1,20 +1,20 @@
 # Crims
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![windows](https://badgen.net/badge/icon/only%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![windows](https://badgen.net/badge/icon/ONLY%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
 
 [![cmake](https://badgen.net/badge/dependency/CMake/red)](https://github.com/WangZhengru/Crims) [![flex-bison](https://badgen.net/badge/dependency/Flex%20&%20Bison/orange)](https://github.com/WangZhengru/Crims) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://github.com/WangZhengru/Crims)
 
 "Car Rental Information Management System" from "Course Project of Programming" in HUST-CSE-2020-Spring
 
-只是一个课设的toy project
+C&数据结构课设的toy project
 
 ## Features
 
 项目采用前后端分离设计，后端使用纯C，前端使用React，并且用了一个node脚本来作为中间件（负责通信转发）
 
-实现了一个简单的汽车租赁管理系统，特性如下：
+实现了一个简单的汽车租赁信息管理系统，特性如下：
 
-+ 后端的数据存储在自定义格式的二进制文件中，启动时递归读取，保存时递归写入；读取数据之后存储在三个方向的十字链表上
++ 后端的数据存储在自定义格式的二进制文件中，启动时递归读取，保存时递归写入；读取数据之后在内存中存储在三个方向的十字链表上
 + 后端使用Flex & Bison构建了一个简易SQL解析器，并针对这个解析器实现了一个简易的SQL解释器，能够根据AST来执行SQL语句
 + 前后端使用socket进行通信，低耦合
 + 前端通过拼接SQL语句发送给后端执行来实现可视化的增删查改
@@ -45,7 +45,7 @@ npm start
 
  **服务端目前仅支持在Windows上运行**
 
-## Developer
+## Contributors
 
 [WangZhengru](https://github.com/WangZhengru)
 

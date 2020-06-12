@@ -87,6 +87,7 @@ inline int run_server()
                         #ifdef DEBUG
                         printf ("%s\n", json_buffer);
                         #endif
+                        Sleep(100);//解决粘包的问题
                         send (client_sockets.fd_array[i], json_buffer, strlen (json_buffer), 0);
                         //send (client_sockets.fd_array[i], recv_buffer, strlen (recv_buffer), 0);
                     }

@@ -60,7 +60,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_error();
+                jsonify_error("SELECT");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -78,7 +78,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_error();
+                jsonify_error("DELETE");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -92,7 +92,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_success();
+                jsonify_success("DELETE");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -110,7 +110,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_error();
+                jsonify_error("INSERT");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -124,7 +124,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_success();
+                jsonify_success("INSERT");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
