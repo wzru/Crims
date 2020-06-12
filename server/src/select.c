@@ -720,11 +720,11 @@ inline ExprNode *eval_expr (ExprNode *expr, Record *rec)
     case EXPR_ADD:
         return eval_add_expr (expr->l, expr->r, rec);
     case EXPR_SUB:
-        return eval_add_expr (expr->l, expr->r, rec);
+        return eval_sub_expr (expr->l, expr->r, rec);
     case EXPR_MUL:
-        return eval_add_expr (expr->l, expr->r, rec);
+        return eval_mul_expr (expr->l, expr->r, rec);
     case EXPR_DIV:
-        return eval_add_expr (expr->l, expr->r, rec);
+        return eval_div_expr (expr->l, expr->r, rec);
     case EXPR_MOD:
         return eval_mod_expr (expr->l, expr->r, rec);
     case EXPR_AND:

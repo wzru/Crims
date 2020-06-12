@@ -57,7 +57,7 @@
 
 | 字段名                 | 显示名称     | 对应JS类型 | 备注                                                         |
 | ---------------------- | ------------ | ---------- | ------------------------------------------------------------ |
-| oid                    | 订单编号     | string     | **主键**，不允许用户填写，如“2019021505”表示2019年2月15日第5个订单 |
+| oid                    | 订单编号     | string     | **主键**，自动生成（不允许用户填写），形如“2019021505”表示2019年2月15日第5个订单 |
 | identity_number        | 身份证号     | string     |                                                              |
 | pname                  | 客人姓名     | string     |                                                              |
 | phone_number           | 手机号码     | string     | 只能是由0-9组成的字符串                                      |
@@ -207,7 +207,7 @@ SELECT CAR_TYPE.tname AS "车辆类型名称",
 
 2. 统计每月每种车辆类型的营业额（产生的实缴费用） ，输出当月每种车辆类型的营业额柱状统计图
 
-   TIPS: 这里的年月让用户输入, 然后拼接为SQL语句
+   TIPS: 需要用户输入年份, 然后拼接为形式如下的SQL语句
 
 ```sql
 SELECT CAR_TYPE.tname AS "车辆类型", 
@@ -230,13 +230,13 @@ SELECT CAR_TYPE.tname AS "车辆类型",
 
 3. 输入年份，统计该年每辆车的营业额（产生的实缴费用）、租用率
 
-   TIPS: 第4列只SELECT出了租用天数, 需要除以总天数(365)才能获得租用率. 如果是2020年(因为还没过完), 那么分母应该改为「今天是今年的第几天」, 才能正确计算租用率
+   TIPS: **需要用户输入年份**。第4列需要除以总天数(365)才能获得租用率. 如果是2020年(因为还没过完), 那么365应该改为「今天是今年的第几天」, 才能正确计算租用率
 
 ```sql
 SELECT CAR_INFO.plate AS "车牌号", 
 	   CAR_INFO.cname AS "车辆名称", 
 	   SUM(RENT_ORDER.actual_fee) AS "营业额", 
-       SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "租用天数"
+       SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365*100 AS "租用率"
        FROM CAR_INFO, RENT_ORDER
        WHERE CAR_INFO.cid=RENT_ORDER.cid
        AND RENT_ORDER.pickup_time >= '2019-01-01' AND RENT_ORDER.pickup_time <= '2019-12-31'
@@ -249,16 +249,16 @@ SELECT CAR_INFO.plate AS "车牌号",
 
 4. 列出**当年**来累计出租天数最多的 10 辆车的出租信息，按累计出租天数降序排序后输出。
 
-   TIPS: 第3列只SELECT出了租用天数, 需要除以「今天是今年的第几天」, 才能得到租用率
+   TIPS: 第3列的365需要换成「今天是今年的第几天」, 才能得到租用率（单位：1%）
 
 ```sql
 SELECT CAR_INFO.plate AS "车牌号",
   	   CAR_INFO.cname AS "车辆名称",
-  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "累计出租天数",
+  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365*100 AS "租用率",
          SUM(RENT_ORDER.actual_fee) AS "营业额"
          FROM CAR_INFO, RENT_ORDER
          WHERE CAR_INFO.cid=RENT_ORDER.cid
-         AND RENT_ORDER.pickup_time > '2019-1-1' 
+         AND RENT_ORDER.pickup_time > '2020-1-1' 
          GROUP BY CAR_INFO.plate
          ORDER BY "累计出租天数" desc
          LIMIT 10;
