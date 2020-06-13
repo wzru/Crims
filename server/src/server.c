@@ -7,8 +7,8 @@
 #include "server.h"
 
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 #else
 #include <arpa/inet.h>
 #include <errno.h>

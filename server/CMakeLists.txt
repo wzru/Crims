@@ -21,49 +21,44 @@ endif(CMAKE_BUILD_TYPE MATCHES Debug)
 add_executable(crims_server ${DIR_SRCS})
 
 if(WIN32)
-  message("Build on WIN32...")
+  message("[INFO]: Build on WIN32...")
   target_link_libraries(crims_server WS2_32)
+  target_link_libraries(crims_server parser.lib)
+  add_custom_target(parser)
+  add_custom_command(
+      TARGET parser
+      PRE_BUILD
+      COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && chdir && make static
+      COMMAND ${CMAKE_COMMAND} -E 
+          copy_if_different  
+          ${PROJECT_SOURCE_DIR}/sql-parser/ast.h
+          ${PROJECT_SOURCE_DIR}/include/ast.h
+      COMMAND ${CMAKE_COMMAND} -E 
+          copy_if_different  
+          ${PROJECT_SOURCE_DIR}/sql-parser/parser.lib
+          ${PROJECT_SOURCE_DIR}/lib/parser.lib
+      #COMMAND cd "${PROJECT_SOURCE_DIR}/sql_parser" && make clean
+  )
+  add_dependencies(crims_server parser)
 else()
   message("Not build on WIN32...")
   # add_compile_options(-lpthread)
   target_link_libraries(crims_server libpthread.so)
+  target_link_libraries(crims_server libparser.a)
+  add_custom_target(parser)
+  add_custom_command(
+      TARGET parser
+      PRE_BUILD
+      COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && make static
+      COMMAND ${CMAKE_COMMAND} -E 
+          copy_if_different  
+          ${PROJECT_SOURCE_DIR}/sql-parser/ast.h
+          ${PROJECT_SOURCE_DIR}/include/ast.h
+      COMMAND ${CMAKE_COMMAND} -E 
+          copy_if_different  
+          ${PROJECT_SOURCE_DIR}/sql-parser/libparser.a
+          ${PROJECT_SOURCE_DIR}/lib/libparser.a
+      #COMMAND cd "${PROJECT_SOURCE_DIR}/sql_parser" && make clean
+  )
+  add_dependencies(crims_server parser)
 endif()
-
-if(WIN32)
-target_link_libraries(crims_server parser.lib)
-add_custom_target(parser)
-add_custom_command(
-    TARGET parser
-    PRE_BUILD
-    COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && make static
-    COMMAND ${CMAKE_COMMAND} -E 
-        copy_if_different  
-        ${PROJECT_SOURCE_DIR}/sql-parser/ast.h
-        ${PROJECT_SOURCE_DIR}/include/ast.h
-    COMMAND ${CMAKE_COMMAND} -E 
-        copy_if_different  
-        ${PROJECT_SOURCE_DIR}/sql-parser/parser.lib
-        ${PROJECT_SOURCE_DIR}/lib/parser.lib
-    #COMMAND cd "${PROJECT_SOURCE_DIR}/sql_parser" && make clean
-)
-add_dependencies(crims_server parser)
-else()
-target_link_libraries(crims_server libparser.a)
-add_custom_target(parser)
-add_custom_command(
-    TARGET parser
-    PRE_BUILD
-    COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && make static
-    COMMAND ${CMAKE_COMMAND} -E 
-        copy_if_different  
-        ${PROJECT_SOURCE_DIR}/sql-parser/ast.h
-        ${PROJECT_SOURCE_DIR}/include/ast.h
-    COMMAND ${CMAKE_COMMAND} -E 
-        copy_if_different  
-        ${PROJECT_SOURCE_DIR}/sql-parser/libparser.a
-        ${PROJECT_SOURCE_DIR}/lib/libparser.a
-    #COMMAND cd "${PROJECT_SOURCE_DIR}/sql_parser" && make clean
-)
-add_dependencies(crims_server parser)
-endif()
-

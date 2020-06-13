@@ -1494,7 +1494,7 @@ inline void print_result(Records *recs)
         }
         print_interval_line();
         printf("%d %s in set (%.2f sec)\n", row_cnt,
-               row_cnt > 1 ? "rows" : "row", (op_end - op_start) / _SC_CLK_TCK);
+               row_cnt > 1 ? "rows" : "row", (op_end - op_start) / CLK_TCK);
     }
 }
 #undef next

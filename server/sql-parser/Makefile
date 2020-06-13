@@ -1,14 +1,15 @@
 ifeq ($(OS),Windows_NT)
- SHELL = cmd.exe
- LIB = parser.lib
+ #echo "Build on Windows"
+ SHELL := cmd.exe
+ LIB := parser.lib
 else
  UNAME_S := $(shell uname -s)
  ifeq ($(UNAME_S),Linux)
- SHELL = /bin/bash
- LIB = libparser.a
+ SHELL := /bin/bash
+ LIB := libparser.a
  endif
  ifeq ($(UNAME_S),Darwin)
- SHELL = zsh
+ SHELL := zsh
  endif
 endif
 # SHELL = cmd.exe

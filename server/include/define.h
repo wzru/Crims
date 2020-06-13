@@ -121,6 +121,9 @@ extern byte crims_status;
 #ifndef Sleep
 #define Sleep sleep
 #endif
+#ifndef CLK_TCK
+#define CLK_TCK _SC_CLK_TCK
+#endif
 #endif
 
 extern char *help_info;
