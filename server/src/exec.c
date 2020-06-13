@@ -51,7 +51,7 @@ inline int exec_single (char *sql)
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
-                plog("[INFO]: Select sucessfully!\n");
+                plog ("[INFO]: Select sucessfully!\n");
                 print_result (&recs);
                 break;
             }
@@ -61,7 +61,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_error("SELECT");
+                jsonify_error ("SELECT");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -79,7 +79,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_error("DELETE");
+                jsonify_error ("DELETE");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -93,7 +93,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_success("DELETE");
+                jsonify_success ("DELETE");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -111,7 +111,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_error("INSERT");
+                jsonify_error ("INSERT");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -125,7 +125,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_success("INSERT");
+                jsonify_success ("INSERT");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
@@ -137,10 +137,34 @@ inline int exec_single (char *sql)
     }
     else if (root->type == UPDATE_STMT)
     {
-        // if (check_select (root->select, NULL))
-        // {
-        //     return STATUS_ERROR;
-        // }
+        int res = do_update (root->update);
+        if (res == ERROR)
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_error ("UPDATE");
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[ERROR]: Update failed!\n");
+                break;
+            }
+            return ERROR;
+        }
+        else
+        {
+            switch (crims_status)
+            {
+            case STATUS_SERVER:
+                jsonify_success ("Update");
+                break;
+            case STATUS_SHELL:
+            case STATUS_EXEC:
+                plog ("[INFO]: Update successfully\n");
+                break;
+            }
+        }
         return 0;
     }
     else

@@ -364,3 +364,29 @@ inline void update_ct_ptr()
         }
     }
 }
+
+inline void *get_val_addr (u16 dest, ExprNode *expr)
+{
+    if (expr == NULL)
+    {
+        return NULL;
+    }
+    switch (expr->type)
+    {
+    case EXPR_INTNUM:
+        if(dest==EXPR_APPROXNUM)
+        {
+            expr->floatval = expr->intval;
+            return & (expr->floatval);
+        } else return & (expr->intval);
+    case EXPR_APPROXNUM:
+        if(dest==EXPR_INTNUM)
+        {
+            expr->intval = expr->floatval;
+            return & (expr->intval);
+        } else return & (expr->floatval);
+    case EXPR_STRING:
+    case EXPR_DATETIME:
+        return expr->strval;
+    }
+}

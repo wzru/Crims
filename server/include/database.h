@@ -5,6 +5,7 @@
 
 #include "define.h"
 #include "exec.h"
+#include "ast.h"
 
 #define DEFAULT_DATABASE_PATH "../data/.db"
 extern char database_path[PATH_LENGTH];
@@ -81,5 +82,7 @@ inline int find_column_by_name (int ti, char *col);
 inline int can_assign (u16 type1, u16 type2);
 
 inline void update_ct_ptr();
+
+inline void *get_val_addr (u16 dest, ExprNode *expr);
 
 #endif

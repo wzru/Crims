@@ -245,4 +245,24 @@
   INSERT INTO CAR_TYPE VALUES ('6', '跑车', 100);
   SELECT * FROM CAR_TYPE;
   ```
+  
 
+## UPDATE
+
+- [x] ```sql
+  UPDATE RENT_ORDER
+  	SET name="李四", phone_number="13388888888"
+  	WHERE oid="2019021505";
+  ```
+
+- [x] ```sql
+  UPDATE CAR_INFO
+  	SET cname="玛莎拉蒂", gear="氮气"
+  	WHERE cid=22;
+  ```
+
+- [x] ```sql
+  UPDATE CAR_TYPE
+  	SET quantity=5
+  	WHERE tname="SUV";
+  ```

@@ -16,6 +16,6 @@ build
 bin
 dll
 obj
+lib
 
 cmake-build-*
-node_modules
