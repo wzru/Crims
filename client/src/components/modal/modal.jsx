@@ -346,7 +346,7 @@ export default function Modal(props) {
             <span>押金</span>
             <input
               disabled
-              defaultValue={editingRentOrder.scheduled_fee * 5}
+              value={editingRentOrder.scheduled_fee * 5}
             />
           </div>
           <div className={css['modal-content-item']}>
