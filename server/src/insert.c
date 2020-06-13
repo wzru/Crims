@@ -56,6 +56,6 @@ inline int do_insert (InsertNode *insert)
         }
         free (buf);
     }
-    plog ("[DATA]: Successfully insert %d %s\n", ccnt, ccnt > 1 ? "rows" : "row");
+    plog ("[SELECT]: Successfully insert %d %s\n", ccnt, ccnt > 1 ? "rows" : "row");
     return ccnt;
 }

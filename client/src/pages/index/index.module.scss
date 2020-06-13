@@ -1,0 +1,49 @@
+.index {
+  @include flex-col;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  background-image: url("../../assets/background.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.welcome {
+  @include flex-col;
+  margin-bottom: 10vh;
+  justify-content: center;
+  width: 90vw;
+  height: 30vh;
+  background-color: rgba($color: #000000, $alpha: 0.3);
+  color: white;
+  font-size: 500%;
+  .welcome-zh {
+    font-size: 80%;
+  }
+}
+// 三个按钮
+.buttons {
+  @include flex-row;
+  justify-content: space-evenly;
+  width: 100vw;
+  // 每个按钮
+  div {
+    @include flex-row;
+    cursor: pointer;
+    font-size: 200%;
+    justify-content: center;
+    width: 15vw;
+    height: 15vw;
+    background-color: $blue;
+    color: white;
+    border-radius: 50%;
+    transition: color, background-color 0.3s;
+    box-sizing: border-box;
+    &:hover {
+      box-sizing: border-box;
+      color: $blue;
+      background-color: white;
+      transition: color, background-color 0.3s;
+    }
+  }
+}

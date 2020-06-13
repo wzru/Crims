@@ -94,18 +94,21 @@ inline void jsonify_result (Records *recs)
             p += sprintf (p, "},");
             ++row_cnt;
         }
-        --p;
-        sprintf (p, "]}");
+        if (row_cnt != 0)
+        {
+            --p;
+        }
     }
+    sprintf (p, "]}");
 }
 #undef next
 
-inline void jsonify_error(char *type)
+inline void jsonify_error (char *type)
 {
     sprintf (json_buffer, "{\"type\":\"%s\",\"success\":false}", type);
 }
 
-inline void jsonify_success(char *type)
+inline void jsonify_success (char *type)
 {
     sprintf (json_buffer, "{\"type\":\"%s\",\"success\":true}", type);
 }

@@ -12,6 +12,7 @@ inline int genericg_update (void *buf, int ti, SetNode *set)
         int vcnt = find_column_by_name (ti, p->column);
         if (vcnt == ERROR)
         {
+            plog("[ERROR]: Unknown column name '%s'\n", p->column);
             return ERROR;
         }
         memcpy (buf + catalog.tbls[ti].cols[vcnt].offset,

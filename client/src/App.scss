@@ -1,0 +1,36 @@
+// 导航栏
+.header {
+  @include flex-row;
+  width: 100vw;
+  height: 50px;
+  position: fixed;
+  background-color: white;
+  box-shadow: 1px 1px 15px #bbbbbb;
+  z-index: 1000;
+}
+// 导航栏子元素
+.header-item {
+  @include flex-row;
+  justify-content: center;
+  width: 5vw;
+  background-color: white;
+  color: $blue;
+  height: 100%;
+  padding: 0 20px;
+  cursor: pointer;
+  transition: color, background-color, 0.3s;
+}
+// 导航栏子元素悬浮状态
+.header-item:hover,
+.current {
+  background-color: $blue;
+  color: white;
+  padding: 0 20px;
+  transition: color, background-color, 0.3s;
+}
+// 内容部分
+.content {
+  position: absolute;
+  top: 50px;
+  width: 100%;
+}

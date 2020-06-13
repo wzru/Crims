@@ -5,6 +5,7 @@
 #include "database.h"
 #include "strptime.h"
 #include "analyze.h"
+#include "update.h"
 #include "delete.h"
 #include "insert.h"
 #include "server.h"
@@ -157,7 +158,7 @@ inline int exec_single (char *sql)
             switch (crims_status)
             {
             case STATUS_SERVER:
-                jsonify_success ("Update");
+                jsonify_success ("UPDATE");
                 break;
             case STATUS_SHELL:
             case STATUS_EXEC:
