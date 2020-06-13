@@ -4,10 +4,6 @@
 *.output
 *.log
 
-lexer.c
-*.tab.c
-*.tab.h
-
 .vscode
 .vs
 .idea
