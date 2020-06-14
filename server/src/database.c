@@ -110,8 +110,8 @@ inline int read_db (char *db)
     FILE *fp = fopen (db, "rb");
     if (fp == NULL)
     {
-        printf ("File open ERROR!\n");
-        return -1;
+        printf ("[ERROR]: Database file open failed!\n");
+        return ERROR;
     }
     while (!feof (fp))
     {
@@ -136,6 +136,7 @@ inline int read_db (char *db)
         }
     }
     fclose (fp);
+    printf ("[DATA]: Database file read successfully!\n");
     return 0;
 }
 
@@ -194,12 +195,13 @@ inline int write_db (char *db)
     FILE *fp = fopen (db, "wb");
     if (fp == NULL)
     {
-        printf ("File open ERROR!\n");
-        return -1;
+        printf ("[ERROR]: Database file open failed!\n");
+        return ERROR;
     }
     write_recursively (head->next, NULL, NULL, TYPE_CAR, fp);
     fclose (fp);
     is_saved = 1;
+    printf ("[DATA]: Database file written successfully!\n");
     return 0;
 }
 
@@ -374,17 +376,25 @@ inline void *get_val_addr (u16 dest, ExprNode *expr)
     switch (expr->type)
     {
     case EXPR_INTNUM:
-        if(dest==EXPR_APPROXNUM)
+        if (dest == EXPR_APPROXNUM)
         {
             expr->floatval = expr->intval;
             return & (expr->floatval);
-        } else return & (expr->intval);
+        }
+        else
+        {
+            return & (expr->intval);
+        }
     case EXPR_APPROXNUM:
-        if(dest==EXPR_INTNUM)
+        if (dest == EXPR_INTNUM)
         {
             expr->intval = expr->floatval;
             return & (expr->intval);
-        } else return & (expr->floatval);
+        }
+        else
+        {
+            return & (expr->floatval);
+        }
     case EXPR_STRING:
     case EXPR_DATETIME:
         return expr->strval;

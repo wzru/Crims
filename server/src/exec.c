@@ -1,6 +1,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "database.h"
 #include "strptime.h"
@@ -26,12 +27,50 @@ byte query_status;
 clock_t op_start, op_end;
 
 /*
+    判断是否是特殊操作, 如SAVE
+*/
+inline int is_spop (char *op, char *sql)
+{
+    while (*sql == ' ' || *sql == '\n' || *sql == '\r' || *sql == '\t')
+    {
+        ++sql;
+    }
+    return !stricmp (op, sql);
+}
+
+/*
     执行单句SQL
 */
 inline int exec_single (char *sql)
 {
     op_start = clock();
     query_initialize();
+    if (is_spop ("SAVE;", sql))
+    {
+        int res = write_db (database_path);
+        if (res != ERROR)
+        {
+            jsonify_success ("SAVE");
+        }
+        else
+        {
+            jsonify_error ("SAVE");
+        }
+        return res;
+    }
+    else if (is_spop ("EXIT;", sql))
+    {
+        int res = write_db (database_path);
+        if (res != ERROR)
+        {
+            jsonify_success ("EXIT");
+        }
+        else
+        {
+            jsonify_error ("EXIT");
+        }
+        exit (res);
+    }
     SqlAst *root = parse_sql (sql);
     //print_ast(root, 0);
     if (root == NULL)
