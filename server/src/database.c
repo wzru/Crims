@@ -271,7 +271,7 @@ inline void insert_rent_order (RentOrder *ro)
             }
 }
 
-char print_json_buffer[JSON_BUFFER_LENGTH];
+char print_json_buffer[BUFFER_LENGTH];
 
 inline void print_car_type (CarType *ct, FILE *stream)
 {

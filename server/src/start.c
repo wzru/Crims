@@ -35,7 +35,7 @@ inline int start (int argc, char *argv[])
     plog ("[INFO]: Reading data from '%s'...\n", database_path);
     //多线程处理, IO不等待
     pthread_t read_db_thread;
-    pthread_create (&read_db_thread, NULL, read_db, database_path);
+    pthread_create (&read_db_thread, NULL, (pf) read_db, database_path);
     initialize_log();
     pthread_join (read_db_thread, NULL);
     // if (read_db (database_path))

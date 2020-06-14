@@ -12,7 +12,7 @@ struct CarType //车辆分类信息结构体
 {
     char code[CAR_TYPE_CODE_LENGTH]; //车辆类型编码, '1'-'5'
     char tname
-        [CAR_TYPE_TNAME_LENGTH]; //车辆类型名称：经济型、商务型、豪华型、SUV、7座及以上车型
+    [CAR_TYPE_TNAME_LENGTH]; //车辆类型名称：经济型、商务型、豪华型、SUV、7座及以上车型
     int quantity;                //库存数量
 };
 typedef struct CarType CarType;
@@ -41,7 +41,7 @@ typedef struct CarInfo CarInfo;
 struct RentOrder
 {
     char oid[RENT_ORDER_OID_LENGTH]; //订单编号,
-                                     //由订单生成时间的年月日+当日订单顺序号组成
+    //由订单生成时间的年月日+当日订单顺序号组成
     char identity_number[RENT_ORDER_IDENTITY_NUMBER_LENGTH]; //身份证号
     char pname[RENT_ORDER_PNAME_LENGTH];                     //客人姓名
     char phone_number[RENT_ORDER_PHONE_NUMBER_LENGTH];       //手机号码
@@ -95,6 +95,7 @@ enum //用来区分当前运行状态
 };
 extern byte crims_status;
 
+#define BUFFER_LENGTH 65536
 #define PATH_LENGTH 256
 
 #define TABLE_COLUMN_COUNT 20
@@ -104,26 +105,28 @@ extern byte crims_status;
 #define DATABASE_TABLE_COUNT 3
 
 #ifndef max
-#define max(a, b) ((a) > (b) ? (a) : (b))
+    #define max(a, b) ((a) > (b) ? (a) : (b))
 #endif
 #ifndef min
-#define min(a, b) ((a) > (b) ? (b) : (a))
+    #define min(a, b) ((a) > (b) ? (b) : (a))
 #endif
+
+typedef void * (*pf) (void *);
 
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
 #else
-#ifndef stricmp
-#define stricmp strcasecmp
-#endif
-#ifndef sprintf_s
-#define sprintf_s snprintf
-#endif
-#ifndef Sleep
-#define Sleep sleep
-#endif
-#ifndef CLK_TCK
-#define CLK_TCK _SC_CLK_TCK
-#endif
+    #ifndef stricmp
+        #define stricmp strcasecmp
+    #endif
+    #ifndef sprintf_s
+        #define sprintf_s snprintf
+    #endif
+    #ifndef Sleep
+        #define Sleep sleep
+    #endif
+    #ifndef CLK_TCK
+        #define CLK_TCK _SC_CLK_TCK
+    #endif
 #endif
 
 extern char *help_info;

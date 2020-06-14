@@ -35,29 +35,14 @@ inline int check_table_column (char *table, char *column, TableColumnArray *p)
     if (p != NULL)
         for (int i = 0; i < p->count; ++i)
         {
-            if (!strcmp (p->table, table) && !strcmp (p->column, column))
+            if (!strcmp ( (char *) p->table, table)
+                    && !strcmp ( (char *) p->column, column))
             {
                 return 0;
             }
         }
     plog ("[ERROR]: Unknown column reference '%s.%s'", table, column);
     return 1;
-}
-
-inline int check_val_list (ExprNode *expr, TableColumnArray *p)
-{
-    int res = 0, tmp;
-    for (ExprNode *ep = expr; ep; ep = ep->next)
-    {
-        tmp = ep->op, ep->op = ep->type, ep->type = tmp;
-        res = check_expr (ep, p);
-        tmp = ep->op, ep->op = ep->type, ep->type = tmp;
-        if (res)
-        {
-            return res;
-        }
-    }
-    return res;
 }
 
 inline int check_expr (ExprNode *expr, TableColumnArray *p)
@@ -73,8 +58,8 @@ inline int check_expr (ExprNode *expr, TableColumnArray *p)
         return check_table (expr->strval, p);
         break;
     case EXPR_TABLE_COLUMN:
-        return check_columns_tables (expr->table, expr->strval, p);
-        break;
+    //return check_columns_tables (expr->table, expr->strval, p);
+    //break;
     case EXPR_STRING:
     case EXPR_INTNUM:
     case EXPR_APPROXNUM:
@@ -138,6 +123,22 @@ inline int check_expr (ExprNode *expr, TableColumnArray *p)
     }
 }
 
+inline int check_val_list (ExprNode *expr, TableColumnArray *p)
+{
+    int res = 0, tmp;
+    for (ExprNode *ep = expr; ep; ep = ep->next)
+    {
+        tmp = ep->op, ep->op = ep->type, ep->type = tmp;
+        res = check_expr (ep, p);
+        tmp = ep->op, ep->op = ep->type, ep->type = tmp;
+        if (res)
+        {
+            return res;
+        }
+    }
+    return res;
+}
+
 inline int check_columns_tables (ExprNode *column_head, TableNode *table_head,
                                  TableColumnArray *table_column_array)
 {
@@ -186,7 +187,7 @@ inline int check_select (SelectNode *select, TableColumnArray *p)
         table_column_array.count = 0;
         p = &table_column_array;
     }
-    int res = check_columns_tables (select->table_head, select->column_head, p);
+    int res = check_columns_tables (select->column_head, select->table_head, p);
     if (res)
     {
         return res;

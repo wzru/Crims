@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include <stdio.h>
 
+#include "select.h"
 #include "json.h"
 
 inline void jsonify_car_type (CarType *ct, char *json)
@@ -49,7 +51,7 @@ inline int jsonify_value (char *json, ExprNode *val)
 
 #define next(i) (is_grpby?recs->recs[i].next:((i)+1))
 
-char json_buffer[JSON_BUFFER_LENGTH];
+char json_buffer[BUFFER_LENGTH];
 Records result;
 inline void jsonify_result (Records *recs)
 {
@@ -76,7 +78,8 @@ inline void jsonify_result (Records *recs)
         }
         if (is_odrby)
         {
-            qsort (result.recs, result.cnt, sizeof (Record), cmp_o);
+            qsort (result.recs, result.cnt, sizeof (Record), (int (*) (const void *,
+                    const void *)) cmp_o);
         }
         for (uint i = limit.start, cnt = 0; i < result.cnt
                 && cnt < limit.count; ++i, ++cnt)

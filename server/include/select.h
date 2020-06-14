@@ -43,6 +43,7 @@ extern u16 col_prop[RECORD_COLUMNS], vcol_prop[RECORD_COLUMNS],
        ocol_prop[RECORD_COLUMNS];
 
 inline int cmp_o (Record *rec1, Record *rec2);
+
 inline void load_item (Record *rec, int beg);
 inline void clear_record (Record *rec);
 inline void clear_records (Records *recs);
@@ -51,10 +52,17 @@ inline void append_record_column (ExprNode *column, Record *rec);
 inline int get_next_record (Record *rec);
 inline int extract_record (ExprNode *column_head, Record *rec, Records *recs);
 inline void add_record (Record *rec, Records *recs);
+
+inline int is_lazy (ExprNode *expr);
+inline int get_column_index (char *col);
+
 inline void query_initialize();
 inline ExprNode *eval_expr (ExprNode *expr, Record *rec);
 inline int do_select (SelectNode *select, Record *rec, Records *recs,
                       byte subq, byte grpby, byte odrby);
 inline void print_result (Records *recs);
+
+inline uint ustrlen (const char *ustr);
+inline byte calc_length (RecordCell *rc);
 
 #endif

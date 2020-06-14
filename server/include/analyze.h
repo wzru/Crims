@@ -15,4 +15,8 @@ inline int check_select (SelectNode *select, TableColumnArray *p);
 inline int check_delete (DeleteNode *delete, TableColumnArray *p);
 inline int check_insert (InsertNode *insert, TableColumnArray *p);
 
+inline int check_columns_tables (ExprNode *column_head, TableNode *table_head,
+                                 TableColumnArray *table_column_array);
+inline int check_val_list (ExprNode *expr, TableColumnArray *p);
+
 #endif

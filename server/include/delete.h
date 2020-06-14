@@ -3,6 +3,8 @@
 
 #include "ast.h"
 
-inline int do_delete(DeleteNode *del);
+inline int do_delete (DeleteNode *del);
+
+inline int is_equal (void *p, int ti, int col, ExprNode *rhs);
 
 #endif
