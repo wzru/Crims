@@ -26,7 +26,7 @@ ws1.onopen = function () {
 
 export default function Admin() {
   // 当前表格的分类
-  const [type, setType] = useState(CARINFO);
+  const [type, setType] = useState(DEFAULT);
   const [active, setActive] = useState(false);
   /* ----车辆类型 cartype ---- */
   // 车辆类型数据
@@ -59,7 +59,6 @@ export default function Admin() {
   const [showModal, setShowModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('添加数据');
   const [modalButton, setModalButton] = useState('添加');
-
 
   /**
    * 点击选择表格
@@ -274,12 +273,14 @@ export default function Admin() {
           ws.send(`UPDATE CAR_TYPE SET quantity=${new_quantity} WHERE code='${code}';`);
         }
       }, 200);
+      setCurCarInfo([]);
     }
     if (type === RENTORDER) {
       const { oid, identity_number, pname, phone_number, cid, pickup_time, scheduled_dropoff_time, actual_dropoff_time, scheduled_fee, actual_fee } = editingRentOrder;
       const { oid: old_oid } = rentOrder[curRentOrder[0]];
       ws.send(`UPDATE RENT_ORDER SET oid='${oid}', identity_number='${identity_number}', pname='${pname}', phone_number='${phone_number}', cid=${Number(cid)}, pickup_time='${pickup_time}', scheduled_dropoff_time='${scheduled_dropoff_time}', deposit=${Number(scheduled_fee) * 5}, actual_dropoff_time='${actual_dropoff_time}', scheduled_fee=${Number(scheduled_fee)}, actual_fee=${Number(actual_fee)} WHERE oid='${old_oid}';`);
       ws.send(SELECTRENTORDER);
+      setCurRentOrder([]);
     }
   }
   const onClickDone = () => {

@@ -3,9 +3,10 @@ import "./App.scss";
 import Index from "./pages/index";
 import { INDEX, ADMIN, QUERY, STAT } from "./constants/pages";
 import Admin from "./pages/admin/admin";
+import Query from "./pages/query/query";
 
 function App() {
-  const [page, setPage] = useState(ADMIN);
+  const [page, setPage] = useState(QUERY);
   return (
     <div className="App">
       {page !== INDEX && (
@@ -25,7 +26,12 @@ function App() {
         </header>
       )}
       {page === INDEX && <Index setPage={setPage} />}
-      <div className="content">{page === ADMIN && <Admin setPage={setPage} />}</div>
+      <div className="content" hidden={page !== ADMIN}>
+        <Admin />
+      </div>
+      <div className="content" hidden={page !== QUERY}>
+        <Query />
+      </div>
     </div>
   );
 }

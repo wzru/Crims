@@ -1,0 +1,237 @@
+$total-width: 90vw;
+.index {
+  @include flex-col;
+  color: $black;
+  width: 100%;
+  height: 100%;
+}
+.buttons-right {
+  @include flex-row;
+  justify-content: flex-end;
+  width: $total-width;
+}
+.buttons-right-item {
+  @include flex-row;
+  justify-content: space-around;
+  padding: 5px;
+  width: 80px;
+  background-color: $blue;
+  color: white;
+  margin-left: 20px;
+  cursor: pointer;
+  img {
+    width: 15px;
+    height: 15px;
+  }
+}
+// 下拉栏
+.options {
+  position: relative;
+  width: $total-width;
+  margin: 50px 0;
+  box-sizing: border-box;
+  color: $grey;
+  cursor: default;
+}
+// 下拉栏-当前表格
+.options-cur {
+  @include flex-row;
+  justify-content: space-between;
+  border: 1px solid #dddddd;
+  padding: 10px;
+  width: 200px;
+}
+.options:hover .options-cur {
+  color: $blue;
+  border: 1px solid $blue;
+  transition: height 0.3s;
+}
+.options-cur-icon {
+  width: 15px;
+  height: 15px;
+  margin: 0 0 0 15px;
+}
+// 下拉栏所有选项
+.options-all {
+  position: absolute;
+  z-index: 10;
+  overflow: hidden;
+  height: 0;
+  box-shadow: 2px 2px 5px grey;
+  transition: height 0.3s;
+  width: 200px;
+}
+.options-all-item {
+  background-color: white;
+  padding: 10px;
+}
+.options-all-item:hover {
+  background-color: $line-grey;
+}
+
+.query-component {
+  @include flex-row;
+  width: $total-width;
+  position: relative;
+}
+.suboptions {
+  @include flex-col;
+  align-items: flex-start;
+  width: $total-width;
+  margin-top: 30px;
+}
+.suboptions-item {
+  @include flex-row;
+  width: 60%;
+  height: 50px;
+  justify-content: space-between;
+}
+.suboptions-item-title {
+  color: $blue;
+}
+.suboptions-item-content {
+  @include flex-row;
+  width: 80%;
+  input {
+    height: 30px;
+    border-radius: 3px;
+    border: 1px solid $grey;
+    margin: 0 10px;
+  }
+  // 高级查询文本框
+}
+.suboptions-textarea {
+  height: 180px;
+  width: 1050px;
+  border-radius: 3px;
+  border: 1px solid $grey;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 120%;
+  resize: none;
+  color: #333333;
+  font-family: Consolas, "Courier New", Courier, monospace;
+}
+.button {
+  margin: 0 10px;
+  padding: 5px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.selected {
+  background-color: $blue;
+  color: white;
+  border: 1px solid $blue;
+}
+.unselected {
+  background-color: white;
+  color: $grey;
+  border: 1px solid $grey;
+}
+// 查询按钮
+.query-button {
+  @include flex-row;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: $blue;
+  color: white;
+}
+
+// 表格
+.table {
+  @include flex-col;
+  align-items: flex-start;
+  border-radius: 10px;
+  font-size: 90%;
+  width: $total-width;
+  overflow-x: scroll;
+}
+// 表格-表头
+.table-title {
+  background-color: #fafafa;
+}
+// 表格-项目
+.table-item {
+  @include flex-row;
+  justify-content: space-evenly;
+  text-align: center;
+  border-bottom: 1px solid #f5f5f5;
+  padding: 10px 0;
+  min-width: 90vw;
+  &:hover {
+    background-color: $line-grey;
+  }
+}
+.table-item-cid {
+  width: 10vw;
+}
+.table-item-tname {
+  width: 10vw;
+}
+.table-item-quantity {
+  width: 10vw;
+}
+.table-item-plate {
+  width: 10vw;
+}
+.table-item-code {
+  width: 10vw;
+}
+.table-item-cname {
+  width: 10vw;
+}
+.table-item-gear {
+  width: 10vw;
+}
+.table-item-daily {
+  width: 10vw;
+}
+.table-item-rent {
+  width: 10vw;
+}
+.table-item-rented {
+  color: $grey;
+}
+.table-item-unrented {
+  color: $blue;
+}
+.table-item-oid {
+  width: 10vw;
+}
+.table-item-identity {
+  width: 10vw;
+}
+.table-item-pname {
+  width: 8vw;
+}
+.table-item-phone {
+  width: 8vh;
+}
+.table-item-pickup {
+  width: 10vw;
+}
+.table-item-scheduledtime {
+  width: 10vw;
+}
+.table-item-deposit {
+  width: 5vw;
+}
+.table-item-actualtime {
+  width: 10vw;
+}
+.table-item-scheduledfee {
+  width: 5vw;
+}
+.table-item-actualfee {
+  width: 5vw;
+}
+.table-item-items {
+  min-width: 12vw;
+}

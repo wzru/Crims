@@ -4,6 +4,8 @@ const Net = require("net");
 
 let globalWs;
 let globalWs1;
+let globalWs2;
+let globalWs3;
 
 // 作为服务端监听接收浏览器的的消息
 const wss = new WebSocketServer({ port: 5000 });
@@ -51,4 +53,52 @@ sc1.on("data", function (msg) {
   console.log("sc1接收到了C服务器的数据", msg);
   // 给浏览器转发消息
   globalWs1.send(msg);
+});
+
+// 作为服务端监听接收浏览器的的消息
+const wss2 = new WebSocketServer({ port: 5002 });
+wss2.on("connection", function (ws) {
+  console.log("wss2连接上了浏览器");
+  globalWs2 = ws;
+  ws.on("message", function (msg) {
+    console.log("ws2接收到了来自浏览器的信息", msg);
+    sc2.write(msg);
+  });
+});
+
+// 作为客户端监听C服务端的消息
+const sc2 = new Net.Socket();
+sc2.setEncoding("utf-8");
+sc2.connect(8000, "127.0.0.1", function () {
+  console.log("sc2连接上了C服务器");
+});
+// 监听C来自服务器的data
+sc2.on("data", function (msg) {
+  console.log("sc2接收到了C服务器的数据", msg);
+  // 给浏览器转发消息
+  globalWs2.send(msg);
+});
+
+// 作为服务端监听接收浏览器的的消息
+const wss3 = new WebSocketServer({ port: 5003 });
+wss3.on("connection", function (ws) {
+  console.log("wss3连接上了浏览器");
+  globalWs3 = ws;
+  ws.on("message", function (msg) {
+    console.log("ws3接收到了来自浏览器的信息", msg);
+    sc3.write(msg);
+  });
+});
+
+// 作为客户端监听C服务端的消息
+const sc3 = new Net.Socket();
+sc3.setEncoding("utf-8");
+sc3.connect(8000, "127.0.0.1", function () {
+  console.log("sc3连接上了C服务器");
+});
+// 监听C来自服务器的data
+sc3.on("data", function (msg) {
+  console.log("sc3接收到了C服务器的数据", msg);
+  // 给浏览器转发消息
+  globalWs3.send(msg);
 });
