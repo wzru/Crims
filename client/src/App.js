@@ -4,9 +4,10 @@ import Index from "./pages/index";
 import { INDEX, ADMIN, QUERY, STAT } from "./constants/pages";
 import Admin from "./pages/admin/admin";
 import Query from "./pages/query/query";
+import Stat from "./pages/stat/stat";
 
 function App() {
-  const [page, setPage] = useState(QUERY);
+  const [page, setPage] = useState(STAT);
   return (
     <div className="App">
       {page !== INDEX && (
@@ -31,6 +32,9 @@ function App() {
       </div>
       <div className="content" hidden={page !== QUERY}>
         <Query />
+      </div>
+      <div className="content" hidden={page !== STAT}>
+        <Stat />
       </div>
     </div>
   );

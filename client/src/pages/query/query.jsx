@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import css from "./query.module.scss";
 import { DEFAULT, CTQUERY, CIQUERY, ROQUERY } from "../../constants/sheet";
 import downIcon from '../../assets/down.svg';

@@ -2,10 +2,7 @@ const WebSocket = require("ws");
 const WebSocketServer = WebSocket.Server;
 const Net = require("net");
 
-let globalWs;
-let globalWs1;
-let globalWs2;
-let globalWs3;
+let globalWs, globalWs1, globalWs2, globalWs3, globalWs4;
 
 // 作为服务端监听接收浏览器的的消息
 const wss = new WebSocketServer({ port: 5000 });
@@ -101,4 +98,28 @@ sc3.on("data", function (msg) {
   console.log("sc3接收到了C服务器的数据", msg);
   // 给浏览器转发消息
   globalWs3.send(msg);
+});
+
+// 作为服务端监听接收浏览器的的消息
+const wss4 = new WebSocketServer({ port: 5004 });
+wss4.on("connection", function (ws) {
+  console.log("wss4连接上了浏览器");
+  globalWs4 = ws;
+  ws.on("message", function (msg) {
+    console.log("ws4接收到了来自浏览器的信息", msg);
+    sc4.write(msg);
+  });
+});
+
+// 作为客户端监听C服务端的消息
+const sc4 = new Net.Socket();
+sc4.setEncoding("utf-8");
+sc4.connect(8000, "127.0.0.1", function () {
+  console.log("sc4连接上了C服务器");
+});
+// 监听C来自服务器的data
+sc4.on("data", function (msg) {
+  console.log("sc4接收到了C服务器的数据", msg);
+  // 给浏览器转发消息
+  globalWs4.send(msg);
 });
