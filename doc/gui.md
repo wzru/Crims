@@ -211,7 +211,7 @@ SELECT CAR_TYPE.tname AS "车辆类型名称",
 
 2. 统计每月每种车辆类型的营业额（产生的实缴费用） ，输出当月每种车辆类型的营业额柱状统计图
 
-   TIPS: 需要用户输入年份, 然后拼接为形式如下的SQL语句
+   TIPS: 需要用户选择年月, 然后拼接为形式如下的SQL语句
 
 ```sql
 SELECT CAR_TYPE.tname AS "车辆类型", 
@@ -258,13 +258,14 @@ SELECT CAR_INFO.plate AS "车牌号",
 ```sql
 SELECT CAR_INFO.plate AS "车牌号",
   	   CAR_INFO.cname AS "车辆名称",
+  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "累计出租天数",
   	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365*100 AS "租用率",
          SUM(RENT_ORDER.actual_fee) AS "营业额"
          FROM CAR_INFO, RENT_ORDER
          WHERE CAR_INFO.cid=RENT_ORDER.cid
-         AND RENT_ORDER.pickup_time > '2020-1-1' 
+         AND RENT_ORDER.pickup_time > '2019-1-1' 
          GROUP BY CAR_INFO.plate
-         ORDER BY "累计出租天数" desc
+         ORDER BY "累计出租天数" DESC
          LIMIT 10;
 ```
 

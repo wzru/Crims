@@ -16,28 +16,41 @@ C&数据结构课设的toy project
 
 + 后端的数据存储在自定义格式的二进制文件中，启动时递归读取，保存时递归写入；读取数据之后在内存中存储在三个方向的十字链表上
 + 后端使用Flex & Bison构建了一个简易SQL解析器，并针对这个解析器实现了一个简易的SQL解释器，能够根据AST来执行SQL语句
-+ 前后端使用socket进行通信，低耦合
++ 前后端使用socket进行通信，低耦合；由于JS不支持原生socket，所以使用了一个node脚本来作为中间件通信转发。
 + 前端通过拼接SQL语句发送给后端执行来实现可视化的增删查改
-+ 前端实现数据统计模块（输出数据统计表和数据统计图），并且实现xls文件的导入和导出
++ 前端实现数据统计模块（输出数据统计表和数据统计图），并且支持xls文件的导入和导出
 
 ## Usage
 
 需要依次启动server, router, client
 
+依次打开三个终端：
+
+1. 启动server服务端
+
 ```bash
-cd Crims/
 # 先启动server端, 默认监听8000端口. 必须要切换到server/bin目录下运行
-cd server/bin
-./crims_server.exe start &
-# 再启动router端, 默认监听5000端口, 做socket转发
-cd ../../router
-node router.js &
-# 最后启动client端(GUI), 默认监听3000端口
-cd ../client
-npm start
+cd Crims/server/bin
+./crims_server.exe start
 ```
 
-之后就可以在浏览器中的`http://localhost:3000`中访问到GUI
+2. 启动router中间件
+
+```bash
+# 再启动router端, 做socket转发
+cd Crims/router
+node router.js
+```
+
+3. 启动client客户端
+
+```bash
+# 最后启动client端(GUI), 默认监听3000端口
+cd Crims/client
+npm install && npm start
+```
+
+之后就可以在浏览器中的`http://localhost:3000`中访问到客户端
 
 ## Requirements
 
