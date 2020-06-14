@@ -15,7 +15,7 @@ $total-width: 90vw;
   justify-content: space-around;
   padding: 5px;
   width: 80px;
-  background-color: $blue;
+  background-color: $green;
   color: white;
   margin-left: 20px;
   cursor: pointer;
@@ -82,7 +82,7 @@ $total-width: 90vw;
 }
 .suboptions-item {
   @include flex-row;
-  width: 60%;
+  width: 100%;
   height: 50px;
   justify-content: space-between;
 }
@@ -91,7 +91,7 @@ $total-width: 90vw;
 }
 .suboptions-item-content {
   @include flex-row;
-  width: 80%;
+  width: 90%;
   input {
     height: 30px;
     border-radius: 3px;

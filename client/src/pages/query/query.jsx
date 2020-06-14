@@ -3,6 +3,7 @@ import css from "./query.module.scss";
 import { DEFAULT, CTQUERY, CIQUERY, ROQUERY } from "../../constants/sheet";
 import downIcon from '../../assets/down.svg';
 import downIconG from '../../assets/down-g.svg';
+import writeWorkbookToLocalFile from "../../utils/writeFile";
 
 const ws2 = new WebSocket('ws://localhost:5002');
 ws2.onopen = function () {
@@ -14,7 +15,7 @@ ws3.onopen = function () {
 }
 
 export default function Query() {
-  const [advanced, setAdvanced] = useState(true);
+  const [advanced, setAdvanced] = useState(false);
   const [type, setType] = useState(DEFAULT);
   const [active, setActive] = useState(false);
   // 数据表格
@@ -177,6 +178,22 @@ export default function Query() {
       }
     }
   }
+  const exportFile = () => {
+    if (!advanced) {
+      if (type === CTQUERY) {
+        writeWorkbookToLocalFile(carType, type);
+      }
+      if (type === CIQUERY) {
+        writeWorkbookToLocalFile(carInfo, type);
+      }
+      if (type === ROQUERY) {
+        writeWorkbookToLocalFile(rentOrder, type);
+      }
+    }
+    else {
+      writeWorkbookToLocalFile(sheetData, '高级查询');
+    }
+  }
   return <div className={css['index']}>
     {/* 下拉菜单 */}
     <div
@@ -199,10 +216,10 @@ export default function Query() {
     </div>
     {/* 导出按钮 */}
     <div className={css['buttons-right']}>
-      <div className={css['buttons-right-item']}><span>导出</span><img alt='' src={require('../../assets/download.svg')} /></div>
+      <div className={css['buttons-right-item']} onClick={exportFile}><span>导出</span><img alt='' src={require('../../assets/download.svg')} /></div>
       <div
         className={css['buttons-right-item']}
-        style={{ backgroundColor: advanced ? "#52c41a" : '#2295ff' }}
+        style={{ backgroundColor: advanced ? "#fa8c16" : '#2295ff' }}
         onClick={() => { setAdvanced(!advanced) }}
       >
         <span>高级查询</span>
@@ -417,8 +434,8 @@ export default function Query() {
         })}
       </div>
     }
-    {!sheetHeader.length &&
-      <div style={{ color: '#2295ff' }}>没有数据喔</div>
+    {sheetHeader.length === 0 && advanced &&
+      < div style={{ color: '#2295ff' }}>没有数据喔</div>
     }
-  </div>
+  </div >
 }

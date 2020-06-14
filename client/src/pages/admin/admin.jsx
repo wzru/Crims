@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect } from "react";
+import React, { useState, createContext } from "react";
 import css from "./admin.module.scss";
 import addIcon from '../../assets/add.svg';
 import addIconG from '../../assets/add-g.svg';
@@ -12,6 +12,8 @@ import Modal from "../../components/modal/modal";
 import { CARTYPE, CARINFO, RENTORDER, DEFAULT } from '../../constants/sheet';
 import { ADD, DEL, EDIT } from "../../constants/manipulation";
 import { SELECTCARTYPE, SELECTCARINFO, SELECTRENTORDER } from '../../constants/sql';
+import readWorkbookFromLocalFile from "../../utils/readFile";
+import writeWorkbookToLocalFile from "../../utils/writeFile";
 
 export const AdminContext = createContext();
 
@@ -294,6 +296,62 @@ export default function Admin() {
       onClickConfirmEdit();
     }
   }
+  const importFile = () => {
+    document.getElementById('inputFile').click();
+  }
+  const onImportFile = (e) => {
+    const { files } = e.target;
+    readWorkbookFromLocalFile(files[0])
+      .then(data => {
+        console.log(data)
+        // 保证表格不为空 
+        const keys = [];
+        if (data.length) {
+          for (const key in data[0]) {
+            keys.push(key);
+          }
+        }
+        if (type === CARINFO && keys.length === 7) {
+          let sql = '';
+          for (let item of data) {
+            sql += `(${item[keys[0]]}, '${item[keys[1]]}', '${item[keys[2]]}', '${item[keys[3]]}', '${item[keys[4]]}', ${item[keys[5]]}, '${item[keys[6]]}'),`;
+          }
+          ws.send(`INSERT INTO CAR_INFO VALUES ${sql.slice(0, -1)};`);
+          ws.send(SELECTCARINFO);
+        }
+        if (type === CARTYPE && keys.length === 3) {
+          let sql = '';
+          for (let item of data) {
+            sql += `('${item[keys[0]]}', '${item[keys[1]]}', ${item[keys[2]]}),`;
+          }
+          ws.send(`INSERT INTO CAR_TYPE VALUES ${sql.slice(0, -1)};`);
+          ws.send(SELECTCARTYPE);
+        }
+        if (type === RENTORDER && keys.length === 11) {
+          let sql = '';
+          for (let item of data) {
+            sql += `('${item[keys[0]]}', '${item[keys[1]]}', '${item[keys[2]]}', '${item[keys[3]]}', ${item[keys[4]]}, '${item[keys[5]]}', '${item[keys[6]]}', ${item[keys[7]]}, '${item[keys[8]]}', ${item[keys[9]]}, ${item[keys[10]]}),`;
+          }
+          ws.send(`INSERT INTO RENT_ORDER VALUES ${sql.slice(0, -1)};`);
+          ws.send(SELECTRENTORDER);
+        }
+      })
+  }
+  const exportFile = () => {
+    if (type === CARTYPE) {
+      writeWorkbookToLocalFile(carType, type);
+    }
+    if (type === CARINFO) {
+      writeWorkbookToLocalFile(carInfo, type);
+    }
+    if (type === RENTORDER) {
+      writeWorkbookToLocalFile(rentOrder, type);
+    }
+  }
+  const saveDatabase = () => {
+    ws.send(`SAVE;`);
+    alert('保存成功');
+  }
   return <div className={css.index}>
     {/* 遮罩 */}
     < div hidden={!showModal} className={css['mask']} onClick={() => setShowModal(false)}></div>
@@ -351,8 +409,16 @@ export default function Admin() {
         />
       </div>
       <div className={css['buttons-right']}>
-        <div className={css['buttons-right-item']}><span>导入</span><img alt='' src={require('../../assets/upload.svg')} /></div>
-        <div className={css['buttons-right-item']}><span>导出</span><img alt='' src={require('../../assets/download.svg')} /></div>
+        <input id='inputFile' type='file' accept='.xlsx, .xls' style={{ display: 'none' }} onChange={onImportFile} />
+        <div className={css['buttons-right-item']} onClick={saveDatabase} style={{ backgroundColor: "#2295ff" }}>
+          <span>保存</span><img alt='' src={require('../../assets/save.svg')} />
+        </div>
+        <div className={css['buttons-right-item']} onClick={importFile}>
+          <span>导入</span><img alt='' src={require('../../assets/upload.svg')} />
+        </div>
+        <div className={css['buttons-right-item']} onClick={exportFile}>
+          <span>导出</span><img alt='' src={require('../../assets/download.svg')} />
+        </div>
       </div>
     </div>
     {/* 车辆分类表格 */}

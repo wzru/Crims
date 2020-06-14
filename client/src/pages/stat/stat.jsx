@@ -265,7 +265,7 @@ export default function STAT() {
         })}
         <div className={css['table-item']} style={{ fontWeight: "bold" }}>
           <div className={css['table-item-items']}>合计</div>
-          <div className={css['table-item-items']}>🚗</div>
+          <div className={css['table-item-items']}><span role='img' aria-label='小汽车'>🚗</span></div>
           <div className={css['table-item-items']}>{ocpStat.map(item => item['营业额']).reduce((pre, cur) => pre + cur)}</div>
           <div className={css['table-item-items']}>{ocpStat.map(item => item['租用率']).reduce((pre, cur) => pre + cur)}%</div>
         </div>

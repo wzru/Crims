@@ -65,7 +65,8 @@
     "webpack-dev-server": "3.10.3",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "4.3.1",
-    "ws": "^7.3.0"
+    "ws": "^7.3.0",
+    "xlsx": "^0.16.2"
   },
   "scripts": {
     "start": "node scripts/start.js",
