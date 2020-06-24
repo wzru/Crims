@@ -39,7 +39,7 @@ inline int is_spop (char *op, char *sql)
 }
 
 /*
-    执行单句SQL
+    执行单句SQL, 输入为单行SQL(含分号)
 */
 inline int exec_single (char *sql)
 {
@@ -213,6 +213,9 @@ inline int exec_single (char *sql)
     }
 }
 
+/*
+    执行SQL, 输入参数为SQL字符串(可能为多行)
+*/
 inline int exec (char *command)
 {
     int l = strlen (command), start = 0;

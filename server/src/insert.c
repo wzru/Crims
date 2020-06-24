@@ -13,9 +13,6 @@ inline int do_insert (InsertNode *insert)
         return ERROR;
     }
     int ti = find_table_by_name (insert->table);
-    // CarType *ct = NULL;
-    // CarInfo *ci = NULL;
-    // RentOrder *ro = NULL;
     void *buf = NULL;
     if (ti == ERROR)
     {

@@ -15,6 +15,9 @@
 #include "log.h"
 #include "server.h"
 
+/*
+    启动服务器
+*/
 inline int start (int argc, char *argv[])
 {
     system ("chcp 65001");

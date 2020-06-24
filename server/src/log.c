@@ -19,6 +19,9 @@ inline void initialize_log()
     }
 }
 
+/*
+    写入日志, 其中fmt为格式化字符串(类似于scanf), 其余为可变参数
+*/
 inline void plog (const char *fmt, ...)
 {
     va_list args;

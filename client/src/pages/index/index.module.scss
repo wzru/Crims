@@ -16,7 +16,7 @@
   height: 30vh;
   background-color: rgba($color: #000000, $alpha: 0.3);
   color: white;
-  font-size: 500%;
+  font-size: 800%;
   .welcome-zh {
     font-size: 80%;
   }
@@ -30,10 +30,10 @@
   div {
     @include flex-row;
     cursor: pointer;
-    font-size: 200%;
+    font-size: 300%;
     justify-content: center;
-    width: 15vw;
-    height: 15vw;
+    width: 10vw;
+    height: 10vw;
     background-color: $blue;
     color: white;
     border-radius: 50%;

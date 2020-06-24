@@ -4,12 +4,18 @@
 #include "select.h"
 #include "json.h"
 
+/*
+    将车辆类别转为JSON
+*/
 inline void jsonify_car_type (CarType *ct, char *json)
 {
     sprintf (json, "{\"code\":\"%s\",\"tname\":\"%s\",\"quantity\":%d}",
              ct->code, ct->tname, ct->quantity);
 }
 
+/*
+    将车辆信息转为JSON
+*/
 inline void jsonify_car_info (CarInfo *ci, char *json)
 {
     sprintf (json,
@@ -18,6 +24,9 @@ inline void jsonify_car_info (CarInfo *ci, char *json)
             );
 }
 
+/*
+    将租车订单转为JSON
+*/
 inline void jsonify_rent_order (RentOrder *ro, char *json)
 {
     sprintf (json,
@@ -28,6 +37,9 @@ inline void jsonify_rent_order (RentOrder *ro, char *json)
             );
 }
 
+/*
+    将表达式类型转为JSON
+*/
 inline int jsonify_value (char *json, ExprNode *val)
 {
     if (val == NULL)
@@ -53,6 +65,9 @@ inline int jsonify_value (char *json, ExprNode *val)
 
 char json_buffer[BUFFER_LENGTH];
 Records result;
+/*
+    将SELECT的结果集转为JSON
+*/
 inline void jsonify_result (Records *recs)
 {
     char *p = json_buffer;
@@ -106,11 +121,17 @@ inline void jsonify_result (Records *recs)
 }
 #undef next
 
+/*
+    将错误信息转为JSON
+*/
 inline void jsonify_error (char *type)
 {
     sprintf (json_buffer, "{\"type\":\"%s\",\"success\":false}", type);
 }
 
+/*
+    将正确信息转为JSON
+*/
 inline void jsonify_success (char *type)
 {
     sprintf (json_buffer, "{\"type\":\"%s\",\"success\":true}", type);

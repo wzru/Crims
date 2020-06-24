@@ -65,6 +65,9 @@ DatabaseInfo catalog =
     }
 };
 
+/*
+    读取数据之前初始化一些全局变量
+*/
 inline void read_initialize()
 {
     head = calloc (1, sizeof (CarType));
@@ -73,6 +76,9 @@ inline void read_initialize()
     ro_ptr = NULL;
 }
 
+/*
+    从stream中读取车辆类别
+*/
 inline void read_car_type (FILE *stream)
 {
     CarTypeNode *ct = calloc (1, sizeof (CarTypeNode));
@@ -84,6 +90,9 @@ inline void read_car_type (FILE *stream)
     ro_ptr = NULL;
 }
 
+/*
+    从stream中读取车辆信息
+*/
 inline void read_car_info (FILE *stream)
 {
     CarInfoNode *ci = calloc (1, sizeof (CarInfoNode));
@@ -95,6 +104,9 @@ inline void read_car_info (FILE *stream)
     ro_ptr->next = NULL;
 }
 
+/*
+    从stream中读取租车订单
+*/
 inline void read_rent_order (FILE *stream)
 {
     RentOrderNode *ro = calloc (1, sizeof (RentOrderNode));
@@ -104,6 +116,10 @@ inline void read_rent_order (FILE *stream)
     ro_ptr->next = NULL;
 }
 
+
+/*
+    递归读取数据文件
+*/
 inline int read_db (char *db)
 {
     read_initialize();
@@ -140,24 +156,36 @@ inline int read_db (char *db)
     return 0;
 }
 
+/*
+    向stream中写入车辆类别
+*/
 inline void write_car_type (CarType *ct, FILE *stream)
 {
     fputc (TYPE_CAR, stream);
     fwrite (ct, sizeof (CarType), 1, stream);
 }
 
+/*
+    向stream中写入车辆信息
+*/
 inline void write_car_info (CarInfo *ci, FILE *stream)
 {
     fputc (TYPE_INFO, stream);
     fwrite (ci, sizeof (CarInfo), 1, stream);
 }
 
+/*
+    向stream中写入租车订单
+*/
 inline void write_rent_order (RentOrder *ro, FILE *stream)
 {
     fputc (TYPE_ORDER, stream);
     fwrite (ro, sizeof (RentOrder), 1, stream);
 }
 
+/*
+    递归写入数据文件
+*/
 inline void write_recursively (CarTypeNode *ct, CarInfoNode *ci,
                                RentOrderNode *ro, int type, FILE *stream)
 {
@@ -190,6 +218,9 @@ inline void write_recursively (CarTypeNode *ct, CarInfoNode *ci,
     }
 }
 
+/*
+    写数据文件
+*/
 inline int write_db (char *db)
 {
     FILE *fp = fopen (db, "wb");

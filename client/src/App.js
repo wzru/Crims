@@ -7,7 +7,7 @@ import Query from "./pages/query/query";
 import Stat from "./pages/stat/stat";
 
 function App() {
-  const [page, setPage] = useState(ADMIN);
+  const [page, setPage] = useState(INDEX);
   return (
     <div className="App">
       {page !== INDEX && (

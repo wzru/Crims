@@ -259,14 +259,14 @@ SELECT CAR_INFO.plate AS "车牌号",
 ```sql
 SELECT CAR_INFO.plate AS "车牌号",
   	   CAR_INFO.cname AS "车辆名称",
-  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "累计出租天数",
+  	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time)) AS "sum",
   	   SUM(TIMESTAMPDIFF(DAY, RENT_ORDER.pickup_time, RENT_ORDER.actual_dropoff_time))/365*100 AS "租用率",
          SUM(RENT_ORDER.actual_fee) AS "营业额"
          FROM CAR_INFO, RENT_ORDER
          WHERE CAR_INFO.cid=RENT_ORDER.cid
          AND RENT_ORDER.pickup_time > '2019-1-1' 
          GROUP BY CAR_INFO.plate
-         ORDER BY "累计出租天数" DESC
+         ORDER BY "sum" DESC
          LIMIT 10;
 ```
 
