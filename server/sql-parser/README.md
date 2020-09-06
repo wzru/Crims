@@ -5,7 +5,7 @@ A concise SQL parser using Flex &amp; Bison
 
 ## Background
 
-因为最近在写[课设]( https://github.com/WangZhengru/Crims )，但课设本身太无聊了，又由于课设是跟数据库操作相关，所以便想写一个SQL解释器。
+因为最近在写[课设]( https://github.com/wzru/Crims )，但课设本身太无聊了，又由于课设是跟数据库操作相关，所以便想写一个SQL解释器。
 
 又由于课设仅限C语言，很自然地只能使用Flex&Bison，这里参考了动物书系列的[flex & bison]( http://shop.oreilly.com/product/9780596155988.do )。原书上有一个SQL解释器的实现（不过给出的源码并没有构建出AST），这个项目参考了这个实现并进行了一些修改，增加了构建AST的实现，减少了一些功能（所以也许并不能叫SQL解释器，得叫CSQL[Concise SQL]解释器）。
 
@@ -276,8 +276,8 @@ typedef struct ExprNode
 
 ## Maintainers
 
-[ShaunWang](https://github.com/WangZhengru)
+[ShaunWang](https://github.com/wzru)
 
 ## License
 
-[GPL-3.0](https://github.com/WangZhengru/Crims/blob/master/LICENSE) © Wang Zhengru
+[GPL-3.0](https://github.com/wzru/Crims/blob/master/LICENSE) © Wang Zhengru

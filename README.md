@@ -1,6 +1,6 @@
 # Crims
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/WangZhengru/Crims) [![licence](https://badgen.net/github/license/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![commits](https://badgen.net/github/commits/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![last-commit](https://badgen.net/github/last-commit/WangZhengru/Crims)](https://github.com/WangZhengru/Crims) [![windows](https://badgen.net/badge/icon/ONLY%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/wzru/Crims) [![licence](https://badgen.net/github/license/wzru/Crims)](https://github.com/wzru/Crims) [![commits](https://badgen.net/github/commits/wzru/Crims)](https://github.com/wzru/Crims) [![last-commit](https://badgen.net/github/last-commit/wzru/Crims)](https://github.com/wzru/Crims) [![windows](https://badgen.net/badge/icon/ONLY%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
 
 [![cmake](https://badgen.net/badge/dependency/CMake/red)](https://cmake.org/) [![flex-bison](https://badgen.net/badge/dependency/Flex/orange)](https://www.gnu.org/software/flex/) [![flex-bison](https://badgen.net/badge/dependency/Bison/pink)](https://www.gnu.org/software/bison/) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://nodejs.org/)
 
@@ -60,8 +60,8 @@ npm install && npm start
 
 ## Contributors
 
-[WangZhengru](https://github.com/WangZhengru)
+[wzru](https://github.com/wzru)
 
 ## License
 
-[GPL-3.0](https://github.com/WangZhengru/Crims/blob/master/LICENSE) © [WangZhengru](https://github.com/WangZhengru)
+[GPL-3.0](https://github.com/wzru/Crims/blob/master/LICENSE) © [wzru](https://github.com/wzru)
