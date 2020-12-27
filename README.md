@@ -1,12 +1,12 @@
 # Crims
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/wzru/Crims) [![licence](https://badgen.net/github/license/wzru/Crims)](https://github.com/wzru/Crims) [![commits](https://badgen.net/github/commits/wzru/Crims)](https://github.com/wzru/Crims) [![last-commit](https://badgen.net/github/last-commit/wzru/Crims)](https://github.com/wzru/Crims) [![windows](https://badgen.net/badge/icon/ONLY%20Windows?icon=windows&label)](https://github.com/WagZhengru/Crims)
+[![build](https://img.shields.io/badge/build-passing-brightgreen.svg?style=plastic-square)](https://github.com/wzru/Crims) [![licence](https://badgen.net/github/license/wzru/Crims)](https://github.com/wzru/Crims) [![commits](https://badgen.net/github/commits/wzru/Crims)](https://github.com/wzru/Crims) [![last-commit](https://badgen.net/github/last-commit/wzru/Crims)](https://github.com/wzru/Crims)
 
 [![cmake](https://badgen.net/badge/dependency/CMake/red)](https://cmake.org/) [![flex-bison](https://badgen.net/badge/dependency/Flex/orange)](https://www.gnu.org/software/flex/) [![flex-bison](https://badgen.net/badge/dependency/Bison/pink)](https://www.gnu.org/software/bison/) [![nodejs](https://badgen.net/badge/dependency/Node%2ejs/green)](https://nodejs.org/)
 
-"Car Rental Information Management System" from "Course Project of Programming" in HUST-CSE-2020-Spring
+"Car Rental Information Management System" from "Course Project of Programming" in HUST-CSE-2020
 
-C&数据结构课设的toy project
+C语言&数据结构&编译原理课设的toy project
 
 ## Features
 
@@ -15,7 +15,7 @@ C&数据结构课设的toy project
 实现了一个简单的汽车租赁信息管理系统，特性如下：
 
 + 后端的数据存储在自定义格式的二进制文件中，启动时递归读取，保存时递归写入；读取数据之后在内存中存储在三个方向的十字链表上
-+ 后端使用Flex & Bison构建了一个简易SQL解析器，并针对这个解析器实现了一个简易的SQL解释器，能够根据AST来执行SQL语句
++ 后端使用**Flex & Bison**构建了一个简易SQL解析器，并针对这个解析器实现了一个简易的SQL解释器，能够根据AST来执行SQL语句
 + 前后端使用socket进行通信，低耦合；由于JS不支持原生socket，所以使用了一个node脚本来作为中间件通信转发。
 + 前端通过拼接SQL语句发送给后端执行来实现可视化的增删查改
 + 前端实现数据统计模块（输出数据统计表和数据统计图），并且支持xls文件的导入和导出
@@ -55,8 +55,6 @@ npm install && npm start
 ## Requirements
 
 这个项目的完整编译/运行依赖于Flex, Bison, CMake, Node.js
-
- **服务端目前仅支持在Windows上运行**
 
 ## Contributors
 
