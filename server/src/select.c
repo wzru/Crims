@@ -6,6 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "define.h"
 #include "debug.h"
 #include "exec.h"
 #include "log.h"
@@ -45,11 +46,11 @@ inline int append_record_table (TableNode *table, Record *rec)
                         ++j)
                 {
                     rec->item[j + k].type = catalog.tbls[i].cols[j].type;
-                    // rec->item[j + k].alias = strdup
+                    // rec->item[j + k].alias = my_strdup
                     // (catalog.tbls[i].cols[j].name);
-                    rec->table[j + k] = strdup (catalog.tbls[i].name);
-                    rec->name[j + k] = strdup (catalog.tbls[i].cols[j].name);
-                    rec->alias[j + k] = strdup (table->alias);
+                    rec->table[j + k] = my_strdup (catalog.tbls[i].name);
+                    rec->name[j + k] = my_strdup (catalog.tbls[i].cols[j].name);
+                    rec->alias[j + k] = my_strdup (table->alias);
                 }
                 rec->tbl[rec->cnt] = i;
                 rec->rtb[i] = rec->cnt;

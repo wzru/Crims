@@ -133,4 +133,6 @@ typedef void * (*pf) (void *);
 
 extern char *help_info;
 
+extern char *my_strdup(const char *s);
+
 #endif
