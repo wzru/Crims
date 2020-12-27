@@ -1,0 +1,3 @@
+[submodule "server/parser"]
+	path = server/parser
+	url = https://github.com/wzru/sql-parser

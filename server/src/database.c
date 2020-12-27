@@ -70,7 +70,7 @@ DatabaseInfo catalog =
 */
 inline void read_initialize()
 {
-    head = calloc (1, sizeof (CarType));
+    head = calloc (1, sizeof (CarTypeNode));
     ct_ptr = head;
     ci_ptr = NULL;
     ro_ptr = NULL;

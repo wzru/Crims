@@ -114,7 +114,9 @@ extern byte crims_status;
 typedef void * (*pf) (void *);
 
 #if defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
+#define OS_WIN
 #else
+#define OS_LINUX
     #ifndef stricmp
         #define stricmp strcasecmp
     #endif

@@ -28,14 +28,14 @@ if(WIN32)
   add_custom_command(
       TARGET parser
       PRE_BUILD
-      COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && chdir && make static
+      COMMAND cd "${PROJECT_SOURCE_DIR}/parser" && chdir && make static
       COMMAND ${CMAKE_COMMAND} -E 
           copy_if_different  
-          ${PROJECT_SOURCE_DIR}/sql-parser/ast.h
+          ${PROJECT_SOURCE_DIR}/parser/ast.h
           ${PROJECT_SOURCE_DIR}/include/ast.h
       COMMAND ${CMAKE_COMMAND} -E 
           copy_if_different  
-          ${PROJECT_SOURCE_DIR}/sql-parser/parser.lib
+          ${PROJECT_SOURCE_DIR}/parser/parser.lib
           ${PROJECT_SOURCE_DIR}/lib/parser.lib
       #COMMAND cd "${PROJECT_SOURCE_DIR}/sql_parser" && make clean
   )
@@ -49,14 +49,14 @@ else()
   add_custom_command(
       TARGET parser
       PRE_BUILD
-      COMMAND cd "${PROJECT_SOURCE_DIR}/sql-parser" && make static
+      COMMAND cd "${PROJECT_SOURCE_DIR}/parser" && make static
       COMMAND ${CMAKE_COMMAND} -E 
           copy_if_different  
-          ${PROJECT_SOURCE_DIR}/sql-parser/ast.h
+          ${PROJECT_SOURCE_DIR}/parser/ast.h
           ${PROJECT_SOURCE_DIR}/include/ast.h
       COMMAND ${CMAKE_COMMAND} -E 
           copy_if_different  
-          ${PROJECT_SOURCE_DIR}/sql-parser/libparser.a
+          ${PROJECT_SOURCE_DIR}/parser/libparser.a
           ${PROJECT_SOURCE_DIR}/lib/libparser.a
       #COMMAND cd "${PROJECT_SOURCE_DIR}/sql_parser" && make clean
   )

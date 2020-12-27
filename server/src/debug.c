@@ -69,7 +69,9 @@ inline int test_read_write() //用来测试读写是否正常
             }
         }
     }
+#ifdef OS_WIN
     system ("chcp 65001");
+#endif
     recursive_print (head->next, NULL, NULL, TYPE_CAR, stdout);
     write_db (database_path);
 }

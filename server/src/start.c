@@ -20,7 +20,9 @@
 */
 inline int start (int argc, char *argv[])
 {
+#ifdef OS_WIN
     system ("chcp 65001");
+#endif
     int opt = 0;
     while ( (opt = getopt (argc, argv, "p:d:")) != -1) //解析参数
     {

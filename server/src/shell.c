@@ -23,7 +23,9 @@ inline void print_command_prompt()
 inline int shell (int argc, char *argv[])
 {
     database_initialize();
+#ifdef OS_WIN
     system ("chcp 65001");
+#endif
     while (1)
     {
         print_command_prompt();

@@ -13,10 +13,6 @@ byte crims_status;
 
 int main (int argc, char *argv[])
 {
-#ifdef DEBUG
-    setbuf (stdout, NULL);
-    setbuf (stderr, NULL);
-#endif
     switch (argc)
     {
     case 0:

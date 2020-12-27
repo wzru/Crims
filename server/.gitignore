@@ -15,3 +15,5 @@ obj
 lib
 
 cmake-build-*
+
+include/ast.h
